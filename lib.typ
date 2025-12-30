@@ -96,6 +96,7 @@
 
   // --- Mathematical formula ---
   set math.equation(numbering: "(1)")
+  show math.equation: set text(font: "Libertinus Math")
 
   // --- Cover Style ---
   align(center + horizon)[
