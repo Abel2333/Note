@@ -88,10 +88,29 @@
 
   // --- Title Style ---
   set heading(numbering: "1.1")
-  show heading.where(level: 1): it => {
-    v(1em)
-    text(16pt, weight: "bold", fill: color-primary)[#it]
-    v(0.5em)
+  show heading: it => {
+    let levels = (16pt, 13pt, 11pt) // fonts of level 1, 2, 3
+    let v_befores = (1.5em, 1.2em, 1em) // Spacing before the title
+    let v_afters = (0.8em, 0.6em, 0.5em) // Spacing after the title
+
+    let lvl = it.level
+    let size = if lvl <= 3 { levels.at(lvl - 1) } else { 11pt }
+    let v_before = if lvl <= 3 { v_befores.at(lvl - 1) } else { 1em }
+    let v_after = if lvl <= 3 { v_afters.at(lvl - 1) } else { 0.5em }
+
+    v(v_before, weak: true)
+    block(width: 100%)[
+      #if lvl == 1 [
+        #text(size, weight: "bold", fill: color-primary)[#it]
+        #v(0.2em)
+        #line(length: 100%, stroke: 1pt + color-primary.lighten(50%))
+      ] else if lvl == 2 [
+        #text(size, weight: "bold", fill: color-primary.lighten(20%))[#it]
+      ] else [
+        #text(size, weight: "bold")[#it]
+      ]
+    ]
+    v(v_after)
   }
 
   // --- Mathematical formula ---

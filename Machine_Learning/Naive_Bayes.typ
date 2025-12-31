@@ -39,7 +39,7 @@ we start from the perspective of *Expected Risk Minimization*.
 The goal of learning is to find a decision rule $f: cal(X) -> cal(Y)$ that minimizes the *Expected Risk*.
 $ R(f) = EE_(X,Y) [L(Y, f(X))] $
 
-By the law of total expection, the risk can be decomposed as:
+By the law of total expectation, the risk can be decomposed as:
 $ R(f) = EE_X [ EE_(Y|X) [L(Y, f(X)) | X=x] ] $
 
 #note[
@@ -97,3 +97,87 @@ Considering that the denominator $P(X=x)$ is the same for all classes, the class
 $
   C^*(x) = limits(op("arg max"))_(c_k in cal(Y)) { P(Y=c_k) limits(product)_(j=1)^n P(X^((j))=x^((j)) | Y=c_k) }
 $
+
+= Parameter Estimation
+
+To implement the classifier, we need to estimate the probabilities from the training set $T$.
+
+#note[
+  By maximizing the log-likelihood function $ell(phi) = sum N_k ln phi_k$ under the constraint $sum phi_k = 1$, we can prove that the MLE for these probabilities corresponds to the empirical frequencies.
+]
+
+
+== Derivation of MLE for Class Priors
+
+To estimate the parameters $phi_k = P(Y=c_k)$ for $k=1, dots, K$, we use the Maximum Likelihood Estimation.
+
+=== Likelihood Function
+Assume the training labels $y_1, dots, y_N$ are independent and identically distributed (i.i.d.). The likelihood function $L(phi)$ is the joint probability of the observed labels:
+
+$
+  L(phi_1, dots, phi_K) = P(y_1, dots, y_N | phi) = product_(i=1)^N P(y_i | phi)
+$
+
+Let $N_k = sum_(i=1)^N I(y_i = c_k)$ be the count of samples belonging to class $c_k$. We can rewrite the likelihood by grouping terms of the same class:
+
+$ L(phi) = product_(k=1)^K phi_k^(N_k) $
+
+=== Log-Likelihood
+To simplify the maximization, we take the natural logarithm, which transforms the product into a sum:
+
+$ ell(phi) = ln L(phi) = sum_(k=1)^K N_k ln phi_k $
+
+=== Lagrange Multiplier
+We need to maximize $ell(phi)$ subject to the constraint that all probabilities sum to one: $sum_(k=1)^K phi_k = 1$. We define the Lagrange function:
+
+$
+  cal(L)(phi, lambda) = sum_(k=1)^K N_k ln phi_k + lambda (1 - sum_(k=1)^K phi_k)
+$
+
+=== Solving for Parameters
+Taking the partial derivative with respect to each $phi_k$ and setting it to zero:
+
+$
+  frac(partial cal(L), partial phi_k) = frac(N_k, phi_k) - lambda = 0 quad ==> quad N_k = lambda phi_k
+$ <mle_step>
+
+To find $lambda$, we sum both sides of @mle_step over all $k$:
+
+$ sum_(k=1)^K N_k = lambda sum_(k=1)^K phi_k $
+
+Since $sum N_k = N$ (total samples) and $sum phi_k = 1$ (probability constraint), we have:
+
+$ N = lambda dot 1 quad ==> quad lambda = N $
+
+=== Final Result
+Substituting $lambda = N$ back into @mle_step, we obtain the MLE for the class prior:
+
+$ hat(phi)_k = frac(N_k, N) = frac(sum_(i=1)^N I(y_i = c_k), N) $
+
+#note[
+  This result proves that the Maximum Likelihood Estimate of a multinomial distribution's parameters is simply the *empirical frequency* of each class in the dataset.
+]
+
+== Maximum Likelihood Estimation (MLE)
+The most intuitive way is to use the relative frequency of events:
+
+1. *Prior Probability:*
+  $ P(Y=c_k) = frac(sum_(i=1)^N I(y_i = c_k), N) $
+
+2. *Conditional Probability (for discrete features):*
+  $
+    P(X^((j)) = a | Y=c_k) = frac(sum_(i=1)^N I(x_i^((j)) = a, y_i = c_k), sum_(i=1)^N I(y_i = c_k))
+  $
+
+== Bayesian Smoothing
+To avoid the *zero-probability problem*, we use _Laplace Smoothing_ (by setting $lambda = 1$):
+
+1. *Smoothed Prior Probability:*
+  $ P_lambda (Y=c_k) = frac(sum_(i=1)^N I(y_i = c_k) + lambda, N + K lambda) $
+
+2. *Smoothed Conditional Probability:*
+  $
+    P_(lambda)(X^((j)) = a | Y=c_k) = frac(sum_(i=1)^N I(x_i^((j)) = a, y_i = c_k) + lambda, sum_(i=1)^N I(y_i = c_k) + S_j lambda)
+  $
+
+where $S_j$ is the number of possible values for the $j$-th feature.
