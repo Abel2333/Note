@@ -151,6 +151,58 @@ We use *likelihood* rather than the log-likelihood here: $L(theta) = cases((1/th
 = Statistical Inference: Uncertainty and Fisher Information
 
 While MLE provides a "point estimate", it is equally important to quantify the uncertainty of this estimate.
+
+== Fisher Information
+
+#definition(title: "Fisher Information")[
+  The Fisher Information $I(theta)$ is used to indicate the confidence of the parameters under given dataset.
+
+  $ I(theta) = -EE_x [ partial^2 / (partial theta^2) ell(theta) ] $<fisher_1>
+  or
+  $ I(theta) = EE_x [ (partial / (partial theta) ell(theta))^2 ] $<fisher_2>
+]
+
+The equivalence between @fisher_1 and @fisher_2, as well as the asymptotic normality of MLE, relies on the following *Regularity Conditions (Cramér-Rao Regularity Conditions)*:
+
++ *Identifiability*: The parameter is identifiable. That is, if $theta_1 != theta_2$, then the probability density functions are distinct: $f(x; theta_1) != f(x; theta_2)$.
+
++ *Common Support*: The support of the distribution, $cal(X) = {x | f(x; theta) > 0}$, does not depend on the parameter $theta$.
+
++ *Interior Point*: The true parameter value $theta$ lies in the interior of the parameter space $Theta$ (an open interval).
+
++ *Differentiability*: The log-likelihood function $log f(x; theta)$ is at least three times continuously differentiable with respect to $theta$ for all $x$.
+
++ *Interchangeability (Differentiation under the Integral)*: The operations of differentiation and integration can be interchanged. This implies that the derivatives are bounded by integrable functions.
+  $
+    integral_(-infinity)^(+infinity) partial / (partial theta) f(x; theta) dif x = partial / (partial theta) integral_(-infinity)^(+infinity) f(x; theta) dif x = 0
+  $<regularity>
+
+=== Equivalence
+
+Obviously, $partial / (partial theta) f = f dot partial / (partial theta) ln f$.
+Substituting it into @regularity, we get
+
+$
+         integral f(x;theta) partial / (partial theta) ln f(x;theta) dif x & = 0 \
+  integral (partial / (partial theta) ln f(x;theta)) dot f(x; theta) dif x & = 0 \
+                             EE_x [ partial / (partial theta) ell(theta) ] & = 0
+$<score_expectation>
+
+Thus, @fisher_2 is the _Variance_ of $partial / (partial theta) ell(theta)$.
+Intuitively, the @fisher_1 is the variance of the rate of change,
+while the @fisher_2 is the expectation of curvature.
+In this side, looks like they refer to the same thing.
+
+Now, we start to proof it mathematically.
+Differentiate both side of @score_expectation,
+$
+  integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) partial / (partial theta) f(x; theta) dif x & = 0 \
+  integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) f(x;theta) (partial / (partial theta) ln f(x; theta)) dif x & = 0 \
+  integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) dif x + integral (partial / (partial theta) ln f(x;theta))^2 f(x;theta) dif x & = 0 \
+  EE_x [partial^2 / (partial theta^2) ell(theta)] + EE_x [(partial / (partial theta) ell(theta))] & = 0
+$
+
+
 // TODO: Add the `Fisher Information`, `Asymptotic Normality of MLE`, `Confidence Intervals (Wald Interval)`
 
 = Likelihood Ratio and Model Comparison
