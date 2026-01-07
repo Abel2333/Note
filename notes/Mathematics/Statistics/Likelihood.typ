@@ -199,9 +199,32 @@ $
   integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) partial / (partial theta) f(x; theta) dif x & = 0 \
   integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) f(x;theta) (partial / (partial theta) ln f(x; theta)) dif x & = 0 \
   integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) dif x + integral (partial / (partial theta) ln f(x;theta))^2 f(x;theta) dif x & = 0 \
-  EE_x [partial^2 / (partial theta^2) ell(theta)] + EE_x [(partial / (partial theta) ell(theta))^2] & = 0
+  EE_x [partial^2 / (partial theta^2) ell(theta)] + EE_x [(partial / (partial theta) ell(theta))^2] & = 0 \
+  ==> - EE_x [partial^2 / (partial theta^2) ell(theta)] = EE_x [(partial / (partial theta) ell(theta))^2]
 $
 
+Therefore, the two definitions of Fisher Information are equivalent undet the given regularity conditions.
+#h(1fr) $qed$
+
+== Asymptotic Normality of MLE
+
+Under the regularity conditions, the Maximum Likelihood Estimator $hat(theta)$ satisfies the asymptotic normality:
+$ sqrt(n)(hat(theta) - theta_0) arrow.r^d cal(N)(0, I(theta_0)^(-1)) $
+which implies that for large $n$, $hat(theta)$ is approximately:
+$ hat(theta) approx cal(N)(theta_0, 1 / (I_n (theta_0))) $
+
+== Construction of Confidence Intervals
+
+Since the true parameter $theta_0$ is unknown, we estimate the variance using the *Observed Fisher Information* $J(hat(theta)) = - partial^2 / (partial theta^2) ell(hat(theta))$.
+
+The standard error is defined as:
+$ wide "SE"(hat(theta)) = 1 / sqrt(J(hat(theta))) $
+
+For a confidence level of $1 - alpha$, the Wald confidence interval is:
+$
+  [hat(theta) - z_(alpha slash 2) dot op("SE")(hat(theta)), quad hat(theta) + z_(alpha slash 2) dot op("SE")(hat(theta))]
+$
+where $z_(alpha slash 2)$ is the $(1-alpha/2)$-quantile of the standard normal distribution.
 
 // TODO: Add the `Fisher Information`, `Asymptotic Normality of MLE`, `Confidence Intervals (Wald Interval)`
 
