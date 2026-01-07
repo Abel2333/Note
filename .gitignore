@@ -1,1 +1,19 @@
+# Compiled outputs
 *.pdf
+build/
+*.aux
+*.log
+
+# Typst cache
+.typst-cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

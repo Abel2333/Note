@@ -1,4 +1,4 @@
-#import "/lib.typ": EE, LL, RR, conf, definition, note, theorem
+#import "/templates/lib.typ": EE, LL, RR, conf, definition, note, theorem
 
 // Set Metadata
 #set document(

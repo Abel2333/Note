@@ -1,4 +1,4 @@
-#import "/lib.typ": conf
+#import "/templates/lib.typ": conf
 
 // Set Metadata
 #set document(

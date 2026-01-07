@@ -1,4 +1,4 @@
-#import "/lib.typ": EE, LL, RR, conf, definition, note, theorem
+#import "/templates/lib.typ": EE, LL, RR, conf, definition, note, theorem
 
 // Set Metadata
 #set document(
@@ -155,7 +155,7 @@ While MLE provides a "point estimate", it is equally important to quantify the u
 == Fisher Information
 
 #definition(title: "Fisher Information")[
-  The Fisher Information $I(theta)$ is used to indicate the confidence of the parameters under given dataset.
+  The Fisher Information $I(theta)$ is used to quantify the precision of the parameters given a dataset.
 
   $ I(theta) = -EE_x [ partial^2 / (partial theta^2) ell(theta) ] $<fisher_1>
   or
@@ -189,17 +189,17 @@ $
 $<score_expectation>
 
 Thus, @fisher_2 is the _Variance_ of $partial / (partial theta) ell(theta)$.
-Intuitively, the @fisher_1 is the variance of the rate of change,
-while the @fisher_2 is the expectation of curvature.
-In this side, looks like they refer to the same thing.
+Intuitively, @fisher_1 represents the expected curvature (second derivative) of the log-likelihood,
+while @fisher_2 represents the expected squared score, which equals the variance of the score function.
+From this perspective, they appear to refer to the same thing.
 
-Now, we start to proof it mathematically.
-Differentiate both side of @score_expectation,
+Now, we proceed to prove this mathematically.
+Differentiate both sides of @score_expectation,
 $
   integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) partial / (partial theta) f(x; theta) dif x & = 0 \
   integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) f(x;theta) (partial / (partial theta) ln f(x; theta)) dif x & = 0 \
   integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) dif x + integral (partial / (partial theta) ln f(x;theta))^2 f(x;theta) dif x & = 0 \
-  EE_x [partial^2 / (partial theta^2) ell(theta)] + EE_x [(partial / (partial theta) ell(theta))] & = 0
+  EE_x [partial^2 / (partial theta^2) ell(theta)] + EE_x [(partial / (partial theta) ell(theta))^2] & = 0
 $
 
 
