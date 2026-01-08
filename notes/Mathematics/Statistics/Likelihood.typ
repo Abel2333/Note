@@ -1,5 +1,8 @@
 #import "/templates/lib.typ": EE, LL, RR, conf, definition, note, theorem
 
+#let grad = $nabla_theta$
+#let hess = $nabla_theta^2$
+
 // Set Metadata
 #set document(
   title: "Likelihood: Theory, Estimation, and Properties",
@@ -157,9 +160,9 @@ While MLE provides a "point estimate", it is equally important to quantify the u
 #definition(title: "Fisher Information")[
   The Fisher Information $I(theta)$ is used to quantify the precision of the parameters given a dataset.
 
-  $ I(theta) = -EE_x [ partial^2 / (partial theta^2) ell(theta) ] $<fisher_1>
+  $ I(theta) = -EE_x [ hess ell(theta) ] $<fisher_1>
   or
-  $ I(theta) = EE_x [ (partial / (partial theta) ell(theta))^2 ] $<fisher_2>
+  $ I(theta) = EE_x [ (grad ell(theta))^2 ] $<fisher_2>
 ]
 
 The equivalence between @fisher_1 and @fisher_2, as well as the asymptotic normality of MLE, relies on the following *Regularity Conditions (Cramér-Rao Regularity Conditions)*:
@@ -174,21 +177,21 @@ The equivalence between @fisher_1 and @fisher_2, as well as the asymptotic norma
 
 + *Interchangeability (Differentiation under the Integral)*: The operations of differentiation and integration can be interchanged. This implies that the derivatives are bounded by integrable functions.
   $
-    integral_(-infinity)^(+infinity) partial / (partial theta) f(x; theta) dif x = partial / (partial theta) integral_(-infinity)^(+infinity) f(x; theta) dif x = 0
+    integral_(-infinity)^(+infinity) grad f(x; theta) dif x = grad integral_(-infinity)^(+infinity) f(x; theta) dif x = 0
   $<regularity>
 
 === Equivalence
 
-Obviously, $partial / (partial theta) f = f dot partial / (partial theta) ln f$.
+Obviously, $grad f = f dot grad ln f$.
 Substituting it into @regularity, we get
 
 $
-         integral f(x;theta) partial / (partial theta) ln f(x;theta) dif x & = 0 \
-  integral (partial / (partial theta) ln f(x;theta)) dot f(x; theta) dif x & = 0 \
-                             EE_x [ partial / (partial theta) ell(theta) ] & = 0
+         integral f(x;theta) grad ln f(x;theta) dif x & = 0 \
+  integral (grad ln f(x;theta)) dot f(x; theta) dif x & = 0 \
+                             EE_x [ grad ell(theta) ] & = 0
 $<score_expectation>
 
-Thus, @fisher_2 is the _Variance_ of $partial / (partial theta) ell(theta)$.
+Thus, @fisher_2 is the _Variance_ of $grad ell(theta)$.
 Intuitively, @fisher_1 represents the expected curvature (second derivative) of the log-likelihood,
 while @fisher_2 represents the expected squared score, which equals the variance of the score function.
 From this perspective, they appear to refer to the same thing.
@@ -196,37 +199,197 @@ From this perspective, they appear to refer to the same thing.
 Now, we proceed to prove this mathematically.
 Differentiate both sides of @score_expectation,
 $
-  integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) partial / (partial theta) f(x; theta) dif x & = 0 \
-  integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) + (partial / (partial theta) ln f(x;theta)) f(x;theta) (partial / (partial theta) ln f(x; theta)) dif x & = 0 \
-  integral (partial^2 / (partial theta^2) ln f(x;theta)) f(x; theta) dif x + integral (partial / (partial theta) ln f(x;theta))^2 f(x;theta) dif x & = 0 \
-  EE_x [partial^2 / (partial theta^2) ell(theta)] + EE_x [(partial / (partial theta) ell(theta))^2] & = 0 \
-  ==> - EE_x [partial^2 / (partial theta^2) ell(theta)] = EE_x [(partial / (partial theta) ell(theta))^2]
+  integral (hess ln f(x;theta)) f(x; theta) + (grad ln f(x;theta)) grad f(x; theta) dif x & = 0 \
+  integral (hess ln f(x;theta)) f(x; theta) + (grad ln f(x;theta)) f(x;theta) (grad ln f(x; theta)) dif x & = 0 \
+  integral (hess ln f(x;theta)) f(x; theta) dif x + integral (grad ln f(x;theta))^2 f(x;theta) dif x & = 0 \
+  EE_x [hess ell(theta)] + EE_x [(grad ell(theta))^2] & = 0 \
+  ==> - EE_x [hess ell(theta)] = EE_x [(grad ell(theta))^2]
 $
 
-Therefore, the two definitions of Fisher Information are equivalent undet the given regularity conditions.
-#h(1fr) $qed$
+Therefore, the two definitions of Fisher Information are equivalent under the given regularity conditions.
+#h(1fr) $square.filled$
 
 == Asymptotic Normality of MLE
 
-Under the regularity conditions, the Maximum Likelihood Estimator $hat(theta)$ satisfies the asymptotic normality:
-$ sqrt(n)(hat(theta) - theta_0) arrow.r^d cal(N)(0, I(theta_0)^(-1)) $
-which implies that for large $n$, $hat(theta)$ is approximately:
+#theorem(title: "Asymptotic Normality of MLE")[
+  Under the regularity conditions, the Maximum Likelihood Estimator $hat(theta)$ satisfies the asymptotic normality:
+  $ sqrt(n)(hat(theta) - theta_0) arrow.r^d cal(N)(0, I(theta_0)^(-1)) $
+]
+This theorem implies that for large $n$, $hat(theta)$ is approximately:
 $ hat(theta) approx cal(N)(theta_0, 1 / (I_n (theta_0))) $
 
-== Construction of Confidence Intervals
+=== Proof: Asymptotic Normality of MLE
 
-Since the true parameter $theta_0$ is unknown, we estimate the variance using the *Observed Fisher Information* $J(hat(theta)) = - partial^2 / (partial theta^2) ell(hat(theta))$.
+Suppose $x_1, x_2, dots, x_n$ are i.i.d. samples from $f(x; theta_0)$, where $theta_0$ is the true parameter.
+Let $ell(theta) = sum_(i=1)^n ln f(x_i; theta)$ be the log-likelihood function.
 
-The standard error is defined as:
-$ wide "SE"(hat(theta)) = 1 / sqrt(J(hat(theta))) $
+*Step 1: Score Equation and Taylor Expansion*
 
-For a confidence level of $1 - alpha$, the Wald confidence interval is:
+The MLE $hat(theta)$ is the solution to the likelihood equation:
+$ grad ell(hat(theta)) = 0 $
+
+Applying a first-order Taylor expansion to the score function around the true parameter $theta_0$:
 $
-  [hat(theta) - z_(alpha slash 2) dot op("SE")(hat(theta)), quad hat(theta) + z_(alpha slash 2) dot op("SE")(hat(theta))]
+  underbrace(grad ell(hat(theta)), = 0) approx grad ell(theta_0) + (hat(theta) - theta_0) hess ell(theta_0)
 $
-where $z_(alpha slash 2)$ is the $(1-alpha/2)$-quantile of the standard normal distribution.
 
-// TODO: Add the `Fisher Information`, `Asymptotic Normality of MLE`, `Confidence Intervals (Wald Interval)`
+Rearranging the terms to isolate $(hat(theta) - theta_0)$:
+$
+  hat(theta) - theta_0 approx - frac(grad ell(theta_0), hess ell(theta_0))
+$
+
+To study the asymptotic behavior, we multiply both sides by $sqrt(n)$:
+$
+  sqrt(n)(hat(theta) - theta_0) approx frac(frac(1, sqrt(n)) grad ell(theta_0), -frac(1, n) hess ell(theta_0))
+$<mle_ratio>
+
+*Step 2: Convergence of the Numerator (CLT)*
+
+#theorem(title: "Lindeberg-Lévy Central Limit Theorem (CLT)")[
+  Let $X_1, X_2, dots, X_n$ be i.i.d. random variables with $EE[X_i] = mu$ and $op("Var")(X_i) = sigma^2 < infinity$. Then:
+  $ 1/sqrt(n) sum_(i=1)^n (X_i - mu) arrow.r^d cal(N)(0, sigma^2) $
+]
+
+The numerator is $frac(1, sqrt(n)) grad ell(theta_0) = frac(1, sqrt(n)) sum_(i=1)^n grad ln f(x_i; theta_0)$.
+Let $s(x_i; theta_0) = grad ln f(x_i; theta_0)$ be the score for a single observation. From our previous derivation of Fisher Information:
+
+- $EE_X [s(X; theta_0)] = 0$ (Score expectation is zero)
+
+- $op("Var")_X (s(X; theta_0)) = EE_X [s(X; theta_0)^2] = I(theta_0)$ (Fisher Information)
+
+By the _Central Limit Theorem (CLT)_, as $n -> infinity$:
+$
+  frac(1, sqrt(n)) sum_(i=1)^n s(x_i; theta_0) arrow.r^d cal(N)(0, I(theta_0))
+$
+
+Substituting definition into this equation, we obtain:
+
+$
+  1 / sqrt(n) sum_(i=1)^n grad ln f(x_i; theta_0) arrow.r^d cal(N)(0, I(theta_0))
+$<clt_numerator>
+
+*Step 3: Convergence of the Denominator (LLN)*
+
+#theorem(title: "Weak Law of Large Numbers (WLLN)")[
+  Let $X_1, X_2, dots, X_n$ be i.i.d. random variables with $EE[X_i] = mu$. Then the sample mean converges in probability to the theoretical mean:
+  $ overline(X)_n = 1/n sum_(i=1)^n X_i arrow.r^p mu $
+]
+
+The denominator is $-frac(1, n) hess ell(theta_0) = -frac(1, n) sum_(i=1)^n hess ln f(x_i; theta_0)$.
+
+By the _Law of Large Numbers (LLN)_:
+$
+  -frac(1, n) sum_(i=1)^n hess ln f(x_i; theta_0) arrow.r^p EE_X [- hess ln f(X; theta_0)] = I(theta_0)
+$<lln_denominator>
+
+*Step 4: Synthesis via Slutsky's Theorem*
+
+#theorem(title: "Slutsky's Theorem")[
+  Let $X_n$ and $Y_n$ be sequences of random variables. If $X_n arrow.r^d X$ and $Y_n arrow.r^p c$ (where $c$ is a constant), then:
+
+  + $X_n + Y_n arrow.r^d X + c$
+
+  + $X_n Y_n arrow.r^d c X$
+
+  + $X_n / Y_n arrow.r^d X / c$ (provided $c != 0$)
+]
+
+From @mle_ratio, @clt_numerator, and @lln_denominator, we consider the ratio:
+$
+  sqrt(n)(hat(theta) - theta_0) approx frac(overbrace(1/sqrt(n) sum_i grad ln f(x_i; theta_0), arrow.r^d cal(N)(0, I(theta_0))), underbrace(-1/n sum_i hess ln f(x_i; theta_0), arrow.r^p I(theta_0)))
+$
+
+By _Slutsky's Theorem_, since the numerator converges in distribution and the denominator converges in probability to a non-zero constant:
+$
+  sqrt(n)(hat(theta) - theta_0) arrow.r^d frac(cal(N)(0, I(theta_0)), I(theta_0)) = cal(N)(0, 1 / (I(theta_0)))
+$
+#h(1fr) $square.filled$
+
+== Confidence Intervals: The Wald Construction
+
+The construction of the Wald interval is not merely a formulaic application but a rigorous progression from the asymptotic normality of the MLE to a practical inferential tool.
+
+=== The Theoretical Foundation
+From the previously proven theorem, we have the asymptotic distribution of the MLE:
+$ sqrt(n)(hat(theta) - theta_0) arrow.r^d cal(N)(0, I(theta_0)^(-1)) $
+This implies that the "standardized" error converges to a standard normal distribution:
+$
+  Z_n = (hat(theta) - theta_0) / sqrt(1 / (n I(theta_0))) arrow.r^d cal(N)(0, 1)
+$
+However, $Z_n$ is not a *statistic* because it depends on the unknown true parameter $theta_0$ within its denominator (the variance).
+
+=== Consistency and Variance Estimation
+
+The theoretical variance of the MLE, $op("Var")(hat(theta)) approx [n I(theta_0)]^(-1)$, depends on the true parameter $theta_0$, which is precisely what we are trying to estimate. To bridge this gap, we rely on the *Consistency of MLE* ($hat(theta) arrow.r^p theta_0$). According to the *Continuous Mapping Theorem*, if $I(theta)$ is a continuous function, then $I(hat(theta))$ is a consistent estimator of $I(theta_0)$.
+
+In practice, we use two primary methods to estimate this "precision" of our estimate:
+
+#note()[
+  Recall that
+  $sqrt(n)(hat(theta) - theta_0) arrow.r^d cal(N)(0, 1 / (I(theta_0)))$.
+  Therefore we have
+  $ hat(theta) arrow.r^d cal(N)(theta_0, [n I(theta_0)]^(-1)) $,
+  which implies $op("Var")(hat(theta)) approx [n I(theta_0)]^(-1)$
+]
+
+*Expected Fisher Information (The Plug-in Method)*
+
+The most direct approach is to calculate the theoretical expectation $I(theta) = -EE_X [hess ln f(X; theta)]$ and evaluate it at the estimated point $hat(theta)$.
+
+$ hat(I)_n_"expected" = n I(hat(theta)) $
+
+- *Characteristics*: This represents the average precision we expect to get from a sample of size $n$ under the model $f(x; hat(theta))$.
+- *Usage*: It is used when the expectation is easy to compute analytically (e.g., for exponential or normal distributions).
+
+*Observed Fisher Information (The Curvature Method)*
+
+In many real-world scenarios, the expectation in $I(theta)$ is difficult or impossible to solve. We instead use the *Observed Fisher Information*, denoted as $J(hat(theta))$, which is the negative Hessian of the log-likelihood evaluated at the MLE:
+
+$
+  J(hat(theta)) = - hess ell(hat(theta)) = - sum_(i=1)^n hess ln f(x_i; hat(theta))
+$
+
+- *Mathematical Justification*: By the *Law of Large Numbers*, the average observed curvature converges to the expected curvature:
+  $
+    1/n J(hat(theta)) approx - 1/n sum_(i=1)^n hess ln f(x_i; theta_0) arrow.r^p EE [- hess ln f(X; theta_0)] = I(theta_0)
+  $
+- *Intuition*: $J(hat(theta))$ measures the *actual* sharpness of the likelihood peak for the specific data we collected. If the peak is very sharp (high curvature), $J(hat(theta))$ is large, meaning the data has high "resolving power" for the parameter.
+
+*Defining the Estimated Variance $hat(V)_n$*
+
+Since Fisher Information represents the total "knowledge" or "precision" gained from the data, its *reciprocal* naturally represents the uncertainty or "spread" of our estimate. We define the estimated variance of $hat(theta)$ as:
+
+$
+  hat(V)_n = cases(
+    [n I(hat(theta))]^(-1) & "using Expected Information",
+    [J(hat(theta))]^(-1) & "using Observed Information"
+  )
+$<hatV_defintion>
+
+#note[
+  In computer software (like R or Python's `scipy.optimize`), the *Observed Fisher Information* is the standard choice. When the optimizer finds the maximum, it numerically calculates the Hessian matrix at that peak. The inverse of this negative Hessian is the "Estimated Covariance Matrix," providing the $op("SE")$ for all estimated parameters simultaneously.
+]
+
+=== Derivation of the Confidence Interval
+For a given significance level $alpha$, we seek an interval $[L, U]$ such that $P(L <= theta_0 <= U) = 1 - alpha$. Using the asymptotic pivot $W_n$:
+$
+  P(-z_(alpha \/ 2) <= (hat(theta) - theta_0) / sqrt(hat(V)_n) <= z_(alpha \/ 2)) approx 1 - alpha
+$
+Rearranging the inequalities to isolate $theta_0$:
+$
+  P(hat(theta) - z_(alpha \/ 2) dot sqrt(hat(V)_n) <= theta_0 <= hat(theta) + z_(alpha \/ 2) dot sqrt(hat(V)_n)) approx 1 - alpha
+$
+Thus, the $(1-alpha)$ *Wald Confidence Interval* is defined as:
+$
+  C I_(1-alpha) = [hat(theta) - z_(alpha \/ 2) dot sqrt(hat(V)_n), quad hat(theta) + z_(alpha \/ 2) dot sqrt(hat(V)_n)]
+$
+, where $hat(V)_n$ is defined by @hatV_defintion.
+
+#note[
+  The Wald interval is _asymptotically valid_, meaning its *nominal coverage* $P(theta_0 in C I)$ converges to the target $1-alpha$ as $n arrow.r infinity$.
+
+  In practice, its performance depends on the _quadratic approximation_ of the log-likelihood. If $ell(theta)$ is highly skewed or non-quadratic near the peak (common in small samples), the true coverage probability may significantly deviate from $1-alpha$. In such cases, the *Likelihood Ratio (LR) interval* is often more robust.
+]
 
 = Likelihood Ratio and Model Comparison
 
