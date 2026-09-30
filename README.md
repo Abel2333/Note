@@ -17,9 +17,17 @@ Note/
 │   │   └── Analysis/               # Mathematical analysis notes
 │   │       └── Cauchy-Schwarz_Inequality.typ
 │   └── Machine_Learning/
-│       └── Supervised/             # Supervised learning algorithms
-│           ├── Naive_Bayes.typ
-│           └── K-Nearest_Neighbors.typ
+│       ├── Supervised/             # Supervised learning algorithms
+│       │   ├── Naive_Bayes.typ
+│       │   └── K-Nearest_Neighbors.typ
+│       └── DeepSeek/               # DeepSeek study collection
+│           ├── DeepSeek_Overview.typ
+│           ├── DeepSeek_Architecture.typ
+│           ├── DeepSeek_Reasoning.typ
+│           ├── DeepSeek_Systems.typ
+│           ├── DeepSeek_Multimodal.typ
+│           ├── DeepSeek_Evidence.typ
+│           └── references.bib
 │
 ├── templates/                      # Typst templates and styling
 │   └── lib.typ                     # Main template library
@@ -64,10 +72,23 @@ make all
 ### Build Specific Categories
 
 ```bash
-make mathematics    # Build only Mathematics notes
-make ml            # Build only Machine Learning notes
+make mathematics  # Build the Mathematics notes
+make ml            # Build the supervised Machine Learning notes
+make deepseek      # Build the DeepSeek study collection
 make guides        # Build only guides
 ```
+
+### DeepSeek Study Collection
+
+The DeepSeek collection is a set of focused English Typst notes with a durable overview, technical derivations, source-class boundaries, and a correction ledger. Start with [`DeepSeek_Overview.typ`](notes/Machine_Learning/DeepSeek/DeepSeek_Overview.typ), then follow the links to the architecture, reasoning, systems, multimodal, and evidence notes. Its bibliography is [`references.bib`](notes/Machine_Learning/DeepSeek/references.bib).
+
+Build it directly with:
+
+```bash
+make deepseek
+```
+
+The collection is also included in `make all`. The notes use an as-of date of 2026-09-30 and do not require the mutable `deepseek-papers.md` outline at build or reading time.
 
 ### Watch for Changes
 
@@ -145,6 +166,10 @@ Refer to `guides/Expression.typ` for a comprehensive guide on writing mathematic
 
 - **Naive Bayes**: Bayes decision theory, conditional independence, parameter estimation
 - **K-Nearest Neighbors**: 1-NN algorithm, Cover-Hart bounds, asymptotic error analysis
+
+#### DeepSeek Study Collection
+
+- **[DeepSeek Collection](notes/Machine_Learning/DeepSeek/DeepSeek_Overview.typ)**: Evolution map, architecture and efficiency, reasoning, systems, multimodality, and an evidence/correction ledger.
 
 ## Contributing
 

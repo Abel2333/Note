@@ -1,10 +1,10 @@
 # Makefile for Note project
 # Compiles Typst notes into PDFs
 
-.PHONY: all clean mathematics ml guides watch help
+.PHONY: all clean mathematics ml deepseek guides watch help
 
 # Default target: build all notes
-all: mathematics ml guides
+all: mathematics ml deepseek guides
 
 # Build all Mathematics notes
 mathematics:
@@ -26,6 +26,18 @@ ml:
 		[ -f "$$file" ] && typst compile --root . "$$file" "build/Machine_Learning/Supervised/$$(basename $$file .typ).pdf" || true; \
 	done
 	@echo "Machine Learning notes built successfully!"
+
+# Build the DeepSeek collection
+# This target is strict so a broken collection document fails the build.
+deepseek:
+	@set -e; \
+	mkdir -p build/Machine_Learning/DeepSeek; \
+	for file in notes/Machine_Learning/DeepSeek/*.typ; do \
+		if [ -f "$$file" ]; then \
+			typst compile --root . "$$file" "build/Machine_Learning/DeepSeek/$$(basename "$$file" .typ).pdf"; \
+		fi; \
+	done
+	@echo "DeepSeek collection built successfully!"
 
 # Build guides
 guides:
@@ -54,6 +66,7 @@ help:
 	@echo "  all         - Build all notes (default)"
 	@echo "  mathematics - Build only Mathematics notes"
 	@echo "  ml          - Build only Machine Learning notes"
+	@echo "  deepseek    - Build the DeepSeek note collection"
 	@echo "  guides      - Build only guides"
 	@echo "  watch       - Watch for changes and rebuild"
 	@echo "  clean       - Remove all build artifacts"
