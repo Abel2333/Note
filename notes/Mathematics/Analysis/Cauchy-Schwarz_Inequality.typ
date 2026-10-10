@@ -1,8 +1,11 @@
+#import "/templates/lib.typ": body-fonts
+
+#show: body-fonts
 #set page(
   paper: "a4",
   margin: (x: 2cm, y: 2.5cm),
 )
-#set text(font: "Liberation Serif", size: 11pt)
+#set text(size: 11pt)
 #set heading(numbering: "1. ")
 #set math.equation(numbering: "(1)")
 

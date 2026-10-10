@@ -5,6 +5,12 @@
 #let color-accent = rgb("#2ECC40")
 #let color-bg-code = rgb("#F5F5F5")
 
+// Apply shared body families and fallback to doc; return styled content without changing sizes, page layout, or external state.
+#let body-fonts(doc) = {
+  set text(font: ("Libertinus Serif", "LXGW WenKai"))
+  doc
+}
+
 // ========================
 // 2. Custom Environments
 // ========================
@@ -74,8 +80,13 @@
   )
 
   // --- Font and Paragraph ---
-  set text(font: ("Libertinus Serif", "LXGW WenKai"), size: 11pt)
+  show: body-fonts
+  set text(size: 11pt)
   set par(justify: true, leading: 0.8em)
+  set table.cell(breakable: false)
+  show figure.caption: set text(size: 9pt, fill: rgb("#5A5A5A"))
+  show figure.caption: set par(justify: false, leading: 0.55em)
+  set figure(gap: 0.6em)
 
   // ---Code block style ---
   show raw.where(block: true): block.with(

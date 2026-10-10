@@ -9,29 +9,29 @@
 
 = Scope and notation
 
-This note follows the architecture line from DeepSeekMoE and MLA through V3, DSA, V4, and V4.1-Flash. The as-of date is *2026-09-30*. A source label such as `[paper]`, `[model card]`, or `[repository]` identifies the evidence class; a model card or repository is not silently treated as a paper.
+This note follows the architecture line from DeepSeekMoE and MLA through V3, DSA, V4, and V4.1-Flash. The as-of date is *2026-09-30*. A source label such as `[paper]`, `[model card]`, or `[repository]` identifies the evidence class; a model card or repository is not silently treated as a paper. General Transformer-FFN MoE definitions, gate variants, capacity semantics, and local routing derivatives are centralized in #link("../Deep_Learning/Mixture_of_Experts.pdf")[Mixture of Experts]; this note keeps only the DeepSeek-specific architecture map.
 
-Let $L$ be sequence length, $d$ the hidden width, $h$ the number of query heads, and $d_h$ the head dimension. For an MoE layer, let $N$ be the number of routed experts, $K$ the number selected per token, and $d_f$ the dense intermediate width. The comparisons below hold under the stated assumptions: equal hidden width, comparable optimizer state, and no hidden communication or quantization overhead unless noted.
+Let $L$ be sequence length, $d$ the hidden width, $h$ the number of query heads, and $d_h$ the head dimension. For an MoE layer, let $N$ be the number of routed experts, $K_r$ the number selected from them per token, $K_s$ the number of always-on shared experts, and $d_f$ the dense intermediate width. This maps the generic MoE notation as $K = K_r = |S_t|$. The active-expert count is $K_"active" = K_r + K_s$; if an external configuration fixes that total, write $K_"total" = K_"active"$ rather than redefining $K$. Such a count directly proxies active parameters or compute only when shared and routed experts have the same relevant structure and width. The comparisons below hold under the stated assumptions: equal hidden width, comparable optimizer state, and no hidden communication or quantization overhead unless noted.
 
-= DeepSeekMoE: sparse compute with specialized experts
+= DeepSeekMoE: sparse compute and specialization intent
 
 A dense feed-forward block applies one transformation to every token:
 
 $ op("FFN")(x) = W_2 op("sigma")(W_1 x), quad W_1 in RR^(d_f times d), quad W_2 in RR^(d times d_f) $
 
-Its parameter and multiply cost scale with $d d_f$. A conventional sparse MoE replaces one FFN by $N$ experts $E_i$ and routes a token to $K$ of them:
+Its parameter and multiply cost scale with $d d_f$. A conventional sparse MoE replaces one FFN by $N$ experts $E_i$ and routes a token to $K_r$ of them:
 
-$ y_t = sum_(i in S_t) p_(t,i) E_i(x_t), quad S_t = op("TopK")_i(s_(t,i)), quad sum_(i in S_t) p_(t,i) = 1 $
+$ y_t = sum_(i in S_t) p_(t,i) E_i(x_t), quad S_t = op("TopK")_i(s_(t,i)), quad |S_t| = K_r, quad sum_(i in S_t) p_(t,i) = 1 $
 
-The total parameter capacity is approximately $N$ times a single expert, while the active compute is approximately $K$ experts. This creates specialization, but it also creates two failure modes: tokens can crowd a few experts, and experts can learn mixtures of unrelated knowledge.
+The total parameter capacity is approximately $N$ times a single expert, while the active routed compute is approximately $K_r$ expert evaluations; shared-path cost is accounted for separately. This design can encourage specialization, but observed semantic roles still depend on the data, task, optimization, and training dynamics. It also creates two failure modes: tokens can crowd a few experts, and experts can learn mixtures of unrelated knowledge.
 
 == Fine-grained segmentation
 
-DeepSeekMoE splits each coarse expert into $m$ experts with intermediate width $d_f / m$. It then selects $m K$ of $m N$ experts. Ignoring router cost,
+DeepSeekMoE splits each coarse expert into $m$ experts with intermediate width $d_f / m$. It then selects $m K_r$ of $m N$ experts. Ignoring router cost,
 
-$ (m K) (d_f / m) = K d_f $
+$ (m K_r) (d_f / m) = K_r d_f $
 
-so active FLOPs remain approximately constant, while the number of possible expert combinations grows from $binom(N, K)$ to $binom(m N, m K)$. The paper's illustrative comparison is
+so active FLOPs remain approximately constant, while the number of possible expert combinations grows from $binom(N, K_r)$ to $binom(m N, m K_r)$. The paper's illustrative comparison is
 
 $ binom(16, 2) = 120 quad "versus" quad binom(64, 8) = 4_426_165_368 $
 
@@ -39,11 +39,11 @@ The combinatorial count is not itself a quality proof. Its useful interpretation
 
 == Shared expert isolation
 
-A fixed set of $K_s$ shared experts is always activated for common knowledge. The router then chooses routed experts for the remaining budget, so $K_r = K - K_s$. A simplified layer is
+A fixed set of $K_s$ shared experts is always activated as a design intended to give broadly reused transformations a common path. The router independently chooses $K_r$ routed experts, with $|S_t| = K_r$. A simplified layer is
 
 $ y_t = sum_(i=1)^(K_s) E_i^s(x_t) + sum_(i in S_t) p_(t,i) E_i^r(x_t) $
 
-This separates ubiquitous transformations from specialized transformations. DeepSeekMoE [paper, #link("https://arxiv.org/abs/2401.06066")[2401.06066]] reports the design; DeepSeek-V2 [paper, #link("https://arxiv.org/abs/2405.04434")[2405.04434]] and later reports reuse the family. The V2 card and later model cards are evidence of model configuration, not independent paper results.
+The architecture separates an always-on path from conditional routed paths and can encourage the intended common-versus-specialized roles; whether semantic specialization emerges still depends on the data, task, optimization, and training dynamics. DeepSeekMoE [paper, #link("https://arxiv.org/abs/2401.06066")[2401.06066]] reports the design; DeepSeek-V2 [paper, #link("https://arxiv.org/abs/2405.04434")[2405.04434]] and later reports reuse the family. The V2 card and later model cards are evidence of model configuration, not independent paper results.
 
 #note[
   The phrase "activated parameters" is conditional on a token and routing policy. Total parameters, active parameters, communication volume, and memory residency are different quantities. A 671B total / 37B activated model can still require distributed storage and all-to-all communication for the routed experts.
@@ -51,7 +51,7 @@ This separates ubiquitous transformations from specialized transformations. Deep
 
 == Routing and communication consequence
 
-Top-$K$ routing sends token representations to expert-parallel devices and returns the results. If $T$ tokens are routed uniformly over $D$ devices, the ideal payload per device is about $T K / D$. Skew increases the maximum payload and therefore the step time. Fine-grained experts improve selection granularity, but they do not remove the all-to-all; node-limited routing and communication kernels are systems solutions discussed in #link("DeepSeek_Systems.pdf")[Systems].
+Top-$K_r$ routing sends token representations to expert-parallel devices and returns the results. If $T$ tokens are routed uniformly over $D$ devices, the ideal payload per device is about $T K_r / D$. Skew increases the maximum payload and therefore the step time. Fine-grained experts improve selection granularity, but they do not remove the all-to-all; node-limited routing and communication kernels are systems solutions discussed in #link("DeepSeek_Systems.pdf")[Systems].
 
 = MLA: compress the KV cache, preserve positional information
 
@@ -101,7 +101,7 @@ MLA also uses a low-rank query projection during training. That reduces activati
 
 = Auxiliary-loss-free load balancing
 
-The standard MoE balance loss adds a gradient objective to equalize expert usage. It can interfere with the language-model objective, especially when the router needs a nonuniform allocation. The auxiliary-loss-free method instead changes only the selection score:
+The standard MoE balance loss adds a gradient objective to equalize expert usage. It can interfere with the language-model objective, especially when the router needs a nonuniform allocation. The auxiliary-loss-free method instead changes only the selection score; the gate variants, local-gradient conditions, and controller limits are developed in #link("../Deep_Learning/Mixture_of_Experts.pdf")[Mixture of Experts]:
 
 $ s'_(t,i) = s_(t,i) + b_i, quad S_t = op("TopK")_i(s'_(t,i)) $
 
@@ -109,7 +109,7 @@ The bias $b_i$ is not added to the mixture weight used to combine expert outputs
 
 $ b_i = b_i + u dot op("sign")(bar(c) - c_i) $
 
-An underused expert receives a positive bias; an overused expert receives a negative bias. Updating from historical or completed-batch statistics avoids using future tokens from the current sequence. The method paper [paper, #link("https://arxiv.org/abs/2408.15664")[2408.15664]] reports lower load violation without the same auxiliary-loss interference. The V3 report [paper, #link("https://arxiv.org/abs/2412.19437")[2412.19437]] explicitly names an auxiliary-loss-free strategy. V4 retains the idea but adds a small sequence-wise balance term, so "loss-free" should not be read as "no balancing signal of any kind."
+An underused expert receives a positive bias; an overused expert receives a negative bias. Updating from historical or completed-batch statistics avoids using future tokens from the current sequence. The method paper [paper, #link("https://arxiv.org/abs/2408.15664")[2408.15664]] reports lower load violation without the same auxiliary-loss interference. The V3 report [paper, #link("https://arxiv.org/abs/2412.19437")[2412.19437]] explicitly names an auxiliary-loss-free strategy and also reports a small sequence-wise balance auxiliary term to prevent extreme per-sequence imbalance. Thus V3's "loss-free" label does not mean that it has no balancing signal. V4 has its own separately reported routing configuration and does not retroactively define V3.
 
 #definition(title: "Router versus mixture")[
   The router chooses $S_t$ with the biased score $s'_(t,i)$. The output mixture uses the unmodified gate weights $p_(t,i)$. Conflating these two operations incorrectly implies that the bias directly changes the expert output scale.

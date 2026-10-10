@@ -20,6 +20,9 @@ Note/
 │       ├── Supervised/             # Supervised learning algorithms
 │       │   ├── Naive_Bayes.typ
 │       │   └── K-Nearest_Neighbors.typ
+│       ├── Deep_Learning/          # General deep-learning foundations
+│       │   ├── Mixture_of_Experts.typ
+│       │   └── references.bib
 │       └── DeepSeek/               # DeepSeek study collection
 │           ├── DeepSeek_Overview.typ
 │           ├── DeepSeek_Architecture.typ
@@ -71,12 +74,43 @@ make all
 
 ### Build Specific Categories
 
-```bash
+```nu
 make mathematics  # Build the Mathematics notes
-make ml            # Build the supervised Machine Learning notes
-make deepseek      # Build the DeepSeek study collection
-make guides        # Build only guides
+make ml           # Build Machine Learning notes, including Deep Learning
+make deep-learning  # Build only general Deep Learning notes
+make deepseek     # Build the DeepSeek study collection
+make guides       # Build only guides
 ```
+
+### Deep Learning Foundations
+
+[`Mixture_of_Experts.typ`](notes/Machine_Learning/Deep_Learning/Mixture_of_Experts.typ) is a self-contained English foundation for Transformer FFN MoE layers. It separates routing definitions, capacity accounting, local gradient conditions, balancing limits, and frozen architecture case studies. The DeepSeek collection links to it for the generic material while retaining model-specific details.
+
+Build it directly with Nushell:
+
+```nu
+make deep-learning
+```
+
+`make ml` also builds this strict target before the existing supervised-learning loop.
+
+### Optional MoE Figure Maintenance
+
+Normal Typst builds consume the checked-in curve SVG and do not require Python.
+The following optional maintainer commands use the existing offline tool
+environment to check the finite examples, inspect indexed-function attachment
+boundaries, check the fixed-support curves, or regenerate that SVG:
+
+```nu
+let moe_figure_env = ($env.HOME | path join "Tools" "pyenvs" "pi-python-repl")
+uv run --offline --project $moe_figure_env python scripts/check_moe_math.py
+uv run --offline --project $moe_figure_env python scripts/check_moe_typesetting.py
+uv run --offline --project $moe_figure_env python scripts/generate_moe_top1_gate_figure.py --check
+uv run --offline --project $moe_figure_env python scripts/generate_moe_top1_gate_figure.py
+```
+
+The final command refreshes `assets/diagrams/moe_top1_gate_comparison.svg`;
+`--check` has no SVG write side effect.
 
 ### DeepSeek Study Collection
 
@@ -166,6 +200,10 @@ Refer to `guides/Expression.typ` for a comprehensive guide on writing mathematic
 
 - **Naive Bayes**: Bayes decision theory, conditional independence, parameter estimation
 - **K-Nearest Neighbors**: 1-NN algorithm, Cover-Hart bounds, asymptotic error analysis
+
+#### Deep Learning
+
+- **[Mixture of Experts](notes/Machine_Learning/Deep_Learning/Mixture_of_Experts.typ)**: Transformer FFN MoE routing, cost and capacity accounting, local gradient boundaries, balance mechanisms, and Switch/Mixtral/DeepSeek case studies.
 
 #### DeepSeek Study Collection
 

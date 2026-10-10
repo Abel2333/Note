@@ -1,7 +1,7 @@
 # Makefile for Note project
 # Compiles Typst notes into PDFs
 
-.PHONY: all clean mathematics ml deepseek guides watch help
+.PHONY: all clean mathematics ml deep-learning deepseek guides watch help
 
 # Default target: build all notes
 all: mathematics ml deepseek guides
@@ -19,13 +19,25 @@ mathematics:
 	@echo "Mathematics notes built successfully!"
 
 # Build all Machine Learning notes
-ml:
+ml: deep-learning
 	@echo "Building Machine Learning notes..."
 	@mkdir -p build/Machine_Learning/Supervised
 	@for file in notes/Machine_Learning/Supervised/*.typ; do \
 		[ -f "$$file" ] && typst compile --root . "$$file" "build/Machine_Learning/Supervised/$$(basename $$file .typ).pdf" || true; \
 	done
 	@echo "Machine Learning notes built successfully!"
+
+# Build the general Deep Learning notes
+# This target is strict so a broken foundation note fails the build.
+deep-learning:
+	@set -e; \
+	mkdir -p build/Machine_Learning/Deep_Learning; \
+	for file in notes/Machine_Learning/Deep_Learning/*.typ; do \
+		if [ -f "$$file" ]; then \
+			typst compile --root . "$$file" "build/Machine_Learning/Deep_Learning/$$(basename "$$file" .typ).pdf"; \
+		fi; \
+	done
+	@echo "Deep Learning notes built successfully!"
 
 # Build the DeepSeek collection
 # This target is strict so a broken collection document fails the build.
@@ -65,7 +77,8 @@ help:
 	@echo "Available targets:"
 	@echo "  all         - Build all notes (default)"
 	@echo "  mathematics - Build only Mathematics notes"
-	@echo "  ml          - Build only Machine Learning notes"
+	@echo "  ml          - Build Machine Learning notes, including Deep Learning foundations"
+	@echo "  deep-learning - Build only general Deep Learning notes"
 	@echo "  deepseek    - Build the DeepSeek note collection"
 	@echo "  guides      - Build only guides"
 	@echo "  watch       - Watch for changes and rebuild"

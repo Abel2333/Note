@@ -20,6 +20,8 @@ The durable sources are the six Typst notes and `references.bib`. The Markdown o
 
 == Start here
 
+Readers who want a general routing foundation can begin with #link("../Deep_Learning/Mixture_of_Experts.pdf")[Mixture of Experts], then continue to #link("DeepSeek_Architecture.pdf")[Architecture] and #link("DeepSeek_Systems.pdf")[Systems]. That optional path is outside this six-document DeepSeek collection; the collection map itself remains below.
+
 #table(
   columns: (1.5fr, 3fr, 2fr),
   table.header([Document], [Question answered], [Primary path]),
@@ -102,7 +104,7 @@ The dates below deliberately separate four events that are often collapsed into 
 
 == Architecture and efficiency
 
-DeepSeekMoE makes the feed-forward block sparse by routing each token to a small number of fine-grained experts while reserving shared experts for common knowledge. MLA then compresses the key-value state rather than storing one full key and value per attention head. V3 combines those ideas with loss-free routing, FP8 arithmetic, MTP, and communication overlap. NSA is a research branch; DSA is the later model-first branch. V4 and V4.1-Flash add CSA/HCA, mHC, Engram, CED, CSA2, and low-precision caches for million-token contexts. The derivations and assumptions are in #link("DeepSeek_Architecture.pdf")[Architecture].
+DeepSeekMoE makes the feed-forward block sparse by routing each token to a small number of fine-grained experts while reserving shared experts for common knowledge. MLA then compresses the key-value state rather than storing one full key and value per attention head. V3 combines those ideas with loss-free routing, FP8 arithmetic, MTP, and communication overlap. NSA is a research branch; DSA is the later model-first branch. V4 and V4.1-Flash add CSA/HCA, mHC, Engram, CED, CSA2, and low-precision caches for million-token contexts. General FFN-MoE definitions and conditional routing assumptions are in #link("../Deep_Learning/Mixture_of_Experts.pdf")[Mixture of Experts]; the DeepSeek-specific derivations and assumptions are in #link("DeepSeek_Architecture.pdf")[Architecture].
 
 == Reasoning and post-training
 
@@ -118,6 +120,7 @@ DeepSeek-VL begins with high-resolution OCR-aware vision-language understanding.
 
 = Reading paths
 
+- *MoE foundations:* #link("../Deep_Learning/Mixture_of_Experts.pdf")[Mixture of Experts] -> #link("DeepSeek_Architecture.pdf")[Architecture] -> #link("DeepSeek_Systems.pdf")[Systems].
 - *Architecture first:* DeepSeekMoE -> V2/MLA -> V3/FP8/MTP -> DSA -> V4 -> V4.1-Flash. Use the correction ledger for NSA's unknown landing and the V4 date discrepancy.
 - *Reasoning first:* DeepSeekMath/GRPO -> Prover-V1.5 -> R1 -> Prover-V2 -> Math-V2 -> V3.2 agentic synthesis.
 - *Deployment first:* Fire-Flyer/3FS -> V3 DualPipe and DeepEP -> ISCA systems analysis -> DSpark -> DSec.
