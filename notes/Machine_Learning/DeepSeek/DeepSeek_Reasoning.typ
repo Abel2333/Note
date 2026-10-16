@@ -15,7 +15,7 @@ Let $pi_theta(y | x)$ be a policy that generates a response $y$ for prompt $x$. 
 
 = DeepSeekMath and GRPO
 
-DeepSeekMath [paper, #link("https://arxiv.org/abs/2402.03300")[2402.03300]] continued pre-training a 7B code model on a mined mathematical corpus, then used supervised fine-tuning and reinforcement learning. Its durable algorithmic contribution is Group Relative Policy Optimization (GRPO).
+The DeepSeekMath paper @deepseek-math continued pre-training a 7B code model on a mined mathematical corpus, then used supervised fine-tuning and reinforcement learning. Its durable algorithmic contribution is Group Relative Policy Optimization (GRPO).
 
 == Objective and group baseline
 
@@ -50,7 +50,7 @@ The paper reports an iterative web-mining pipeline, decontamination against benc
 
 == DeepSeek-Prover
 
-DeepSeek-Prover [paper, #link("https://arxiv.org/abs/2405.14333")[2405.14333]] treats Lean as a correctness oracle. Natural-language competition problems are autoformalized into Lean statements, filtered for quality and inconsistent hypotheses, and paired with machine-checked proofs. The core loop is
+The DeepSeek-Prover paper @deepseek-prover treats Lean as a correctness oracle. Natural-language competition problems are autoformalized into Lean statements, filtered for quality and inconsistent hypotheses, and paired with machine-checked proofs. The core loop is
 
 $ x -> l -> p -> v -> a $
 
@@ -60,7 +60,7 @@ The paper reports 8 million formal statements with proofs, 712,073 high-quality 
 
 == Prover-V1.5: verifier feedback and search
 
-Prover-V1.5 [paper, #link("https://arxiv.org/abs/2408.08152")[2408.08152]] turns the proof assistant into an RL environment. In RL from Proof Assistant Feedback (RLPAF), Lean supplies a binary reward. GRPO is useful here because a separate critic is difficult to train when successful proof trajectories are sparse.
+The Prover-V1.5 paper @deepseek-prover-v15 turns the proof assistant into an RL environment. In RL from Proof Assistant Feedback (RLPAF), Lean supplies a binary reward. GRPO is useful here because a separate critic is difficult to train when successful proof trajectories are sparse.
 
 The report combines three loops:
 
@@ -72,7 +72,7 @@ The paper reports 63.5 percent miniF2F-test with tree search and 60.2 percent fo
 
 = R1: from verifiable rewards to general reasoning
 
-DeepSeek-R1 [paper, #link("https://arxiv.org/abs/2501.12948")[2501.12948]] separates a pure-RL experiment, R1-Zero, from a later multi-stage R1 recipe.
+The DeepSeek-R1 paper @deepseek-r1 separates a pure-RL experiment, R1-Zero, from a later multi-stage R1 recipe.
 
 == R1-Zero
 
@@ -105,7 +105,7 @@ Rule-based rewards work well when an answer can be checked by arithmetic, a comp
 
 1. *Coder-V2 reward model:* the code report says it used a reward model rather than raw compiler 0/1 feedback because tests have incomplete coverage and compiler signals are noisy.
 2. *R1 helpfulness and safety:* the later RL stage includes learned reward signals after the R1-Zero rule-reward experiment.
-3. *Generalist reward modeling:* Inference-Time Scaling for Generalist Reward Modeling [paper, #link("https://arxiv.org/abs/2504.02495")[2504.02495]] studies SPCT and DeepSeek-GRM, using multiple sampled evaluations and aggregation rather than assuming one greedy judge is reliable.
+3. *Generalist reward modeling:* The Inference-Time Scaling for Generalist Reward Modeling paper @generalist-reward-modeling studies SPCT and DeepSeek-GRM, using multiple sampled evaluations and aggregation rather than assuming one greedy judge is reliable.
 
 A learned reward model is itself a model with calibration and distribution-shift risks. A reward score can be useful for ranking candidates without being a proof of correctness. This is why the collection keeps verifier-backed results and reward-model results in separate descriptions.
 
@@ -113,7 +113,7 @@ A learned reward model is itself a model with calibration and distribution-shift
 
 == Prover-V2: decomposition before proof search
 
-DeepSeek-Prover-V2 [paper, #link("https://arxiv.org/abs/2504.21801")[2504.21801]] uses a large model to decompose a theorem into intermediate subgoals, then asks a smaller or specialized prover to solve the subgoals in Lean. The design changes the search space from one long proof to a sequence of locally checkable obligations:
+The DeepSeek-Prover-V2 paper @deepseek-prover-v2 uses a large model to decompose a theorem into intermediate subgoals, then asks a smaller or specialized prover to solve the subgoals in Lean. The design changes the search space from one long proof to a sequence of locally checkable obligations:
 
 $ G_0 -> (G_1, G_2, dots, G_m), quad G_j in cal(G). $
 
@@ -121,7 +121,7 @@ The decomposition is only useful when the generated subgoals preserve equivalenc
 
 == DeepSeekMath-V2: self-verification
 
-DeepSeekMath-V2 [paper, #link("https://arxiv.org/abs/2511.22570")[2511.22570]] extends the idea of a verifier to natural-language mathematical proofs. A generator proposes a solution, a verifier critiques it against a rubric, and a meta-verifier evaluates whether the critique itself is useful. The training signal can be represented as
+The DeepSeekMath-V2 paper @deepseek-math-v2 extends the idea of a verifier to natural-language mathematical proofs. A generator proposes a solution, a verifier critiques it against a rubric, and a meta-verifier evaluates whether the critique itself is useful. The training signal can be represented as
 
 $ r = alpha r_a + beta r_b, quad alpha + beta = 1 $
 
@@ -129,7 +129,7 @@ The exact components and weights are report-specific. The important systems prop
 
 = Agentic task synthesis and V3.2
 
-DeepSeek-V3.2 [paper, #link("https://arxiv.org/abs/2512.02556")[2512.02556]] makes agentic reasoning a data and environment problem as well as a policy problem. The report describes more than 1,800 environments and more than 85,000 complex instructions, specialist distillation across math, programming, general reasoning, coding agents, search, and related domains, followed by a mixed RL stage.
+The DeepSeek-V3.2 report @deepseek-v32 makes agentic reasoning a data and environment problem as well as a policy problem. The report describes more than 1,800 environments and more than 85,000 complex instructions, specialist distillation across math, programming, general reasoning, coding agents, search, and related domains, followed by a mixed RL stage.
 
 The training abstraction is:
 
@@ -162,4 +162,8 @@ The most useful conceptual chain is *verifier -> reward -> search -> environment
 
 = Source trail
 
-Primary papers: #link("https://arxiv.org/abs/2402.03300")[DeepSeekMath], #link("https://arxiv.org/abs/2405.14333")[DeepSeek-Prover], #link("https://arxiv.org/abs/2408.08152")[Prover-V1.5], #link("https://arxiv.org/abs/2501.12948")[R1], #link("https://arxiv.org/abs/2504.02495")[Inference-Time Scaling for Generalist Reward Modeling], #link("https://arxiv.org/abs/2504.21801")[Prover-V2], #link("https://arxiv.org/abs/2511.22570")[DeepSeekMath-V2], and #link("https://arxiv.org/abs/2512.02556")[V3.2]. The #link("https://api-docs.deepseek.com/news/news250120/")[R1 release note] and #link("https://api-docs.deepseek.com/news/news251201/")[V3.2 release note] are official release artifacts, not substitutes for those papers.
+Primary papers: DeepSeekMath @deepseek-math, DeepSeek-Prover @deepseek-prover, Prover-V1.5 @deepseek-prover-v15, R1 @deepseek-r1, Inference-Time Scaling for Generalist Reward Modeling @generalist-reward-modeling, Prover-V2 @deepseek-prover-v2, DeepSeekMath-V2 @deepseek-math-v2, and V3.2 @deepseek-v32. The R1 release note @release-r1 and V3.2 release note @release-v32 are official release artifacts, not substitutes for those papers.
+
+= References
+
+#bibliography("references.bib", title: none)

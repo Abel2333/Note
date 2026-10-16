@@ -50,13 +50,13 @@ The dates below deliberately separate four events that are often collapsed into 
   [2024-01-25], [DeepSeek-Coder], [arXiv:2401.14196], [same family], [--], [Code model report, not a V2 report.],
   [2024-02-05], [DeepSeekMath and GRPO], [arXiv:2402.03300], [math checkpoints], [--], [Reasoning/post-training method first appears here.],
   [2024-03-08], [DeepSeek-VL], [arXiv:2403.05525], [1.3B and 7B], [--], [First documented DeepSeek vision-language family.],
-  [approx. 2024-04-22], [DeepSeek-V2 initial card / weights], [--], [#link("https://huggingface.co/deepseek-ai/DeepSeek-V2")[model card / weights]], [--], [Approximate card timestamp; distinct from the paper and API update.],
-  [2024-05-07], [DeepSeek-V2 paper], [#link("https://arxiv.org/abs/2405.04434")[arXiv:2405.04434 v1]], [--], [--], [MLA and V2 MoE report; not a card or API event.],
-  [2024-05-17], [V2-0517 API and chat update], [--], [--], [#link("https://api-docs.deepseek.com/updates/")[product / API update]], [Official changelog entry; distinct from the paper and card.],
-  [approx. 2024-06-14], [DeepSeek-Coder-V2 cards / weights], [--], [#link("https://huggingface.co/deepseek-ai/DeepSeek-Coder-V2-Instruct")[model cards / weights]], [--], [Approximate card timing; their paper tag is not the Coder-V2 report.],
-  [2024-06-14], [Coder-V2 API update], [--], [--], [#link("https://api-docs.deepseek.com/updates/")[product / API update]], [Official changelog event; separate from the cards and paper.],
-  [2024-06-17], [DeepSeek-Coder-V2 paper], [#link("https://arxiv.org/abs/2406.11931")[arXiv:2406.11931]], [--], [--], [Continued pre-training from a V2 checkpoint.],
-  [2024-06-28], [V2-0628 revision], [--], [#link("https://huggingface.co/deepseek-ai/DeepSeek-V2-Chat-0628")[model card]], [#link("https://api-docs.deepseek.com/updates/")[product / API revision]], [Changelog and card disagree on baselines; see Evidence.],
+  [approx. 2024-04-22], [DeepSeek-V2 initial card / weights], [--], [model card / weights @card-v2], [--], [Approximate card timestamp; distinct from the paper and API update.],
+  [2024-05-07], [DeepSeek-V2 paper], [arXiv:2405.04434 v1 @deepseek-v2], [--], [--], [MLA and V2 MoE report; not a card or API event.],
+  [2024-05-17], [V2-0517 API and chat update], [--], [--], [product / API update @release-v2-0517], [Official changelog entry; distinct from the paper and card.],
+  [approx. 2024-06-14], [DeepSeek-Coder-V2 cards / weights], [--], [model cards / weights @card-coder-v2], [--], [Approximate card timing; their paper tag is not the Coder-V2 report.],
+  [2024-06-14], [Coder-V2 API update], [--], [--], [product / API update @release-coder-v2-0614], [Official changelog event; separate from the cards and paper.],
+  [2024-06-17], [DeepSeek-Coder-V2 paper], [arXiv:2406.11931 @deepseek-coder-v2], [--], [--], [Continued pre-training from a V2 checkpoint.],
+  [2024-06-28], [V2-0628 revision], [--], [model card @card-v2-0628], [product / API revision @release-v2-0628], [Changelog and card disagree on baselines; see Evidence.],
   [2024-08-15], [DeepSeek-Prover-V1.5], [arXiv:2408.08152], [prover checkpoints], [--], [Formal proving and GRPO from verifier feedback.],
   [2024-08-26], [Fire-Flyer AI-HPC], [arXiv:2408.14158], [--], [infrastructure], [Systems report; no named model landing is asserted.],
   [2024-08-28], [Auxiliary-loss-free balancing], [arXiv:2408.15664], [--], [--], [Component paper before explicit V3 adoption.],
@@ -64,9 +64,9 @@ The dates below deliberately separate four events that are often collapsed into 
   [2024-12-13], [DeepSeek-VL2], [arXiv:2412.10302], [VL2 family], [--], [Dynamic tiling plus sparse language model.],
   [2024-12-26], [Introducing DeepSeek-V3], [--], [V3 release materials], [product preview], [Official product/blog release one day before the report.],
   [2024-12-27], [DeepSeek-V3 Technical Report], [arXiv:2412.19437], [V3 card / weights], [--], [MLA, MoE, FP8, DualPipe, and MTP integration point.],
-  [around 2025-01-20], [DeepSeek-R1 card / weights], [--], [#link("https://huggingface.co/deepseek-ai/DeepSeek-R1")[model card / weights]], [--], [Card evidence is kept separate from the same-period product release and later paper.],
-  [2025-01-20], [DeepSeek-R1 product release], [--], [--], [#link("https://api-docs.deepseek.com/news/news250120/")[product release]], [Official release artifact; not a paper.],
-  [2025-01-22], [DeepSeek-R1 paper], [#link("https://arxiv.org/abs/2501.12948")[arXiv:2501.12948]], [--], [--], [R1-Zero and multi-stage R1 post-training report.],
+  [around 2025-01-20], [DeepSeek-R1 card / weights], [--], [model card / weights @card-r1], [--], [Card evidence is kept separate from the same-period product release and later paper.],
+  [2025-01-20], [DeepSeek-R1 product release], [--], [--], [product release @release-r1], [Official release artifact; not a paper.],
+  [2025-01-22], [DeepSeek-R1 paper], [arXiv:2501.12948 @deepseek-r1], [--], [--], [R1-Zero and multi-stage R1 post-training report.],
   [2025-01-29], [Janus-Pro], [arXiv:2501.17811], [1B and 7B], [--], [Follow-up scaling of Janus; no later landing is claimed.],
   [2025-02-16], [Native Sparse Attention (NSA)], [arXiv:2502.11089], [research backbone], [--], [Research sparse-attention line; later adoption is unknown.],
   [2025-03-24], [V3-0324], [--], [model card / weights], [product revision], [No standalone paper found in checked sources.],
@@ -85,7 +85,7 @@ The dates below deliberately separate four events that are often collapsed into 
   [2026-01-28], [DeepSeek-OCR 2], [arXiv:2601.20552], [weights / repo], [--], [Visual causal flow; its own table was only partially checked.],
   [2026-04-24], [V4 preview], [--], [V4 release materials], [product preview], [Official preview before the report.],
   [2026-04-26], [DeepSeek-V4], [arXiv:2606.19348], [V4-Pro / V4-Flash], [product family], [Printed date says April although identifier begins 2606; see Evidence.],
-  [2026-04-30], [Thinking with Visual Primitives], [no checked arXiv record], [#link("https://zenodo.org/records/20125351")[Zenodo record] / #link("https://huggingface.co/datasets/NodeLinker/deepseek-ai-Thinking-with-Visual-Primitives-deleted-repo")[mirror]], [technical-report release], [Technical-report record and third-party mirror; not counted as an arXiv paper.],
+  [2026-04-30], [Thinking with Visual Primitives], [no checked arXiv record], [Zenodo record @visual-primitives-zenodo / mirror @visual-primitives-mirror], [technical-report release], [Technical-report record and third-party mirror; not counted as an arXiv paper.],
   [2026-06-27], [V4-Flash-DSpark and V4-Pro-DSpark], [--], [checkpoint cards], [serving release], [Attached draft modules, not new base models.],
   [2026-07-06], [DSpark], [arXiv:2607.05147], [checkpoint cards precede paper], [live serving claim], [Model/checkpoint first, paper nine days later.],
   [2026-07-31], [V4-Flash-0731], [--], [model card / weights], [product revision], [Card describes post-training revision with unchanged architecture.],
@@ -142,10 +142,14 @@ Completeness language is scoped to the checked sources and the date above. A que
 
 = Selected source links
 
-The full key-to-source mapping is in #link("DeepSeek_Evidence.pdf")[Evidence] and `references.bib`. The central papers are #link("https://arxiv.org/abs/2405.04434")[DeepSeek-V2], #link("https://arxiv.org/abs/2412.19437")[DeepSeek-V3], #link("https://arxiv.org/abs/2402.03300")[DeepSeekMath], #link("https://arxiv.org/abs/2501.12948")[DeepSeek-R1], #link("https://arxiv.org/abs/2512.02556")[DeepSeek-V3.2], #link("https://arxiv.org/abs/2606.19348")[DeepSeek-V4], and #link("https://arxiv.org/abs/2609.19969")[DeepSeek-V4.1-Flash].
+The full key-to-source mapping is in #link("DeepSeek_Evidence.pdf")[Evidence] and `references.bib`. The central papers are DeepSeek-V2 @deepseek-v2, DeepSeek-V3 @deepseek-v3, DeepSeekMath @deepseek-math, DeepSeek-R1 @deepseek-r1, DeepSeek-V3.2 @deepseek-v32, DeepSeek-V4 @deepseek-v4, and DeepSeek-V4.1-Flash @deepseek-v41-flash.
 
-Official non-paper surfaces include the #link("https://api-docs.deepseek.com/updates/")[DeepSeek release index], #link("https://github.com/deepseek-ai/DeepEP")[DeepEP], #link("https://github.com/deepseek-ai/DualPipe")[DualPipe], #link("https://github.com/deepseek-ai/3FS")[3FS], #link("https://github.com/deepseek-ai/DeepSpec")[DeepSpec], and #link("https://github.com/deepseek-ai/DeepSeek-OCR-2")[DeepSeek-OCR-2].
+Official non-paper surfaces include the DeepSeek release index @release-index, DeepEP @repo-deepep, DualPipe @repo-dualpipe, 3FS @repo-3fs, DeepSpec @repo-deepspec, and DeepSeek-OCR-2 @repo-ocr2.
 
 = Boundaries and open questions
 
 The checked material does not establish whether NSA, ESFT, RLPAF, RMaxTS, SPCT/DeepSeek-GRM, JanusFlow's rectified-flow head, or visual primitives shipped in a later production model. It also does not establish a paper for V3.1, V3.1-Terminus, R1-0528, V4-Flash-0731, or V4-Pro general availability. These are bounded evidence statements, not global non-existence claims. The detailed ledger records what was checked and what remains unknown.
+
+= References
+
+#bibliography("references.bib", title: none)

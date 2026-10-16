@@ -12,6 +12,9 @@ This repository contains a collection of well-structured academic notes covering
 Note/
 ├── notes/                          # All note content
 │   ├── Mathematics/
+│   │   ├── Optimization/           # Optimization notes
+│   │   │   ├── Lagrangian_Duality.typ
+│   │   │   └── references.bib
 │   │   ├── Statistics/             # Statistics notes
 │   │   │   └── Likelihood.typ
 │   │   └── Analysis/               # Mathematical analysis notes
@@ -76,6 +79,7 @@ make all
 
 ```nu
 make mathematics  # Build the Mathematics notes
+make optimization # Build the Lagrangian-duality note
 make ml           # Build Machine Learning notes, including Deep Learning
 make deep-learning  # Build only general Deep Learning notes
 make deepseek     # Build the DeepSeek study collection
@@ -94,17 +98,45 @@ make deep-learning
 
 `make ml` also builds this strict target before the existing supervised-learning loop.
 
+### Optimization Foundations
+
+[`Lagrangian_Duality.typ`](notes/Mathematics/Optimization/Lagrangian_Duality.typ)
+introduces constrained minimization from a scalar running example, then develops
+weak and strong duality, Slater's condition, KKT certificates, recovery limits,
+and the fixed-score MoE balanced-assignment dual convention.
+
+Build it directly with Nushell:
+
+```nu
+make optimization
+```
+
+`make mathematics` and `make all` run this strict target before the legacy
+Mathematics loops.
+
+### Optional Lagrangian-Duality Figure Maintenance
+
+Normal Typst builds consume the checked-in SVG and do not require Python. The
+following optional maintainer commands use the existing offline tool environment
+to check the scalar identities or regenerate the SVG:
+
+```nu
+let lagrangian_figure_env = ($env.HOME | path join "Tools" "pyenvs" "pi-python-repl")
+uv run --offline --project $lagrangian_figure_env python scripts/generate_lagrangian_duality_figure.py --check
+uv run --offline --project $lagrangian_figure_env python scripts/generate_lagrangian_duality_figure.py
+```
+
+The final command refreshes `assets/diagrams/lagrangian_primal_dual_bounds.svg`;
+`--check` has no SVG write side effect.
+
 ### Optional MoE Figure Maintenance
 
 Normal Typst builds consume the checked-in curve SVG and do not require Python.
 The following optional maintainer commands use the existing offline tool
-environment to check the finite examples, inspect indexed-function attachment
-boundaries, check the fixed-support curves, or regenerate that SVG:
+environment to check fixed-support curve behavior or regenerate that SVG:
 
 ```nu
 let moe_figure_env = ($env.HOME | path join "Tools" "pyenvs" "pi-python-repl")
-uv run --offline --project $moe_figure_env python scripts/check_moe_math.py
-uv run --offline --project $moe_figure_env python scripts/check_moe_typesetting.py
 uv run --offline --project $moe_figure_env python scripts/generate_moe_top1_gate_figure.py --check
 uv run --offline --project $moe_figure_env python scripts/generate_moe_top1_gate_figure.py
 ```
@@ -169,6 +201,19 @@ make help
 Content goes here...
 ```
 
+### Citations
+
+The shared template selects IEEE citation and bibliography styles. Keep source metadata in the topic's `references.bib`, cite a source in prose with `@key`, and place one cited-only list under a single heading in each PDF with sources:
+
+```typst
+The source reports this result @key.
+
+= References
+#bibliography("references.bib", title: none)
+```
+
+`DeepSeek_Evidence.typ` intentionally uses `full: true` as the collection source index. Relative `#link("Other_Note.pdf")[Other Note]` links are internal navigation, not citations. State the source class in prose, such as a paper, model card, official release note, repository, or third-party source.
+
 ### Available Template Components
 
 - `theorem(title: "...", body)` - Theorem boxes
@@ -185,6 +230,10 @@ Refer to `guides/Expression.typ` for a comprehensive guide on writing mathematic
 ## Current Notes
 
 ### Mathematics
+
+#### Optimization
+
+- **[Lagrangian Duality](notes/Mathematics/Optimization/Lagrangian_Duality.typ)**: Constrained minimization, weak and strong duality, Slater's condition, KKT certificates, recovery limits, and the fixed-score MoE assignment dual.
 
 #### Statistics
 

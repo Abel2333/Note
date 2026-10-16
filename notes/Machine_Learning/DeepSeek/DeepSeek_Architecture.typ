@@ -43,7 +43,7 @@ A fixed set of $K_s$ shared experts is always activated as a design intended to 
 
 $ y_t = sum_(i=1)^(K_s) E_i^s(x_t) + sum_(i in S_t) p_(t,i) E_i^r(x_t) $
 
-The architecture separates an always-on path from conditional routed paths and can encourage the intended common-versus-specialized roles; whether semantic specialization emerges still depends on the data, task, optimization, and training dynamics. DeepSeekMoE [paper, #link("https://arxiv.org/abs/2401.06066")[2401.06066]] reports the design; DeepSeek-V2 [paper, #link("https://arxiv.org/abs/2405.04434")[2405.04434]] and later reports reuse the family. The V2 card and later model cards are evidence of model configuration, not independent paper results.
+The architecture separates an always-on path from conditional routed paths and can encourage the intended common-versus-specialized roles; whether semantic specialization emerges still depends on the data, task, optimization, and training dynamics. The DeepSeekMoE paper @deepseek-moe reports the design; the DeepSeek-V2 report @deepseek-v2 and later reports reuse the family. The V2 card and later model cards are evidence of model configuration, not independent paper results.
 
 #note[
   The phrase "activated parameters" is conditional on a token and routing policy. Total parameters, active parameters, communication volume, and memory residency are different quantities. A 671B total / 37B activated model can still require distributed storage and all-to-all communication for the routed experts.
@@ -93,7 +93,7 @@ and, against the stated MHA baseline,
 
 $ M_"MLA" / M_"MHA" = (d_c + d_r) / (2 h d_h) $
 
-This is a cache-storage comparison, not an attention-FLOP or universal runtime theorem; projection fusion, KV-head sharing, precision, and kernel layout affect realized savings. The V2 report gives the mechanism and reports a 93.3 percent KV-cache reduction against the DeepSeek 67B baseline. A later systems report gives a concrete BF16 comparison: V3 at 70.272 KB per token, Qwen-2.5 72B at 327.680 KB, and LLaMA-3.1 405B at 516.096 KB [paper, #link("https://arxiv.org/abs/2505.09343")[2505.09343]]. Those are source-reported measurements under that report's configurations, not universal constants.
+This is a cache-storage comparison, not an attention-FLOP or universal runtime theorem; projection fusion, KV-head sharing, precision, and kernel layout affect realized savings. The V2 report gives the mechanism and reports a 93.3 percent KV-cache reduction against the DeepSeek 67B baseline. A later systems report @v3-hardware gives a concrete BF16 comparison: V3 at 70.272 KB per token, Qwen-2.5 72B at 327.680 KB, and LLaMA-3.1 405B at 516.096 KB. Those are source-reported measurements under that report's configurations, not universal constants.
 
 == Training-memory distinction
 
@@ -109,7 +109,7 @@ The bias $b_i$ is not added to the mixture weight used to combine expert outputs
 
 $ b_i = b_i + u dot op("sign")(bar(c) - c_i) $
 
-An underused expert receives a positive bias; an overused expert receives a negative bias. Updating from historical or completed-batch statistics avoids using future tokens from the current sequence. The method paper [paper, #link("https://arxiv.org/abs/2408.15664")[2408.15664]] reports lower load violation without the same auxiliary-loss interference. The V3 report [paper, #link("https://arxiv.org/abs/2412.19437")[2412.19437]] explicitly names an auxiliary-loss-free strategy and also reports a small sequence-wise balance auxiliary term to prevent extreme per-sequence imbalance. Thus V3's "loss-free" label does not mean that it has no balancing signal. V4 has its own separately reported routing configuration and does not retroactively define V3.
+An underused expert receives a positive bias; an overused expert receives a negative bias. Updating from historical or completed-batch statistics avoids using future tokens from the current sequence. The method paper @loss-free-balancing reports lower load violation without the same auxiliary-loss interference. The V3 report @deepseek-v3 explicitly names an auxiliary-loss-free strategy and also reports a small sequence-wise balance auxiliary term to prevent extreme per-sequence imbalance. Thus V3's "loss-free" label does not mean that it has no balancing signal. V4 has its own separately reported routing configuration and does not retroactively define V3.
 
 #definition(title: "Router versus mixture")[
   The router chooses $S_t$ with the biased score $s'_(t,i)$. The output mixture uses the unmodified gate weights $p_(t,i)$. Conflating these two operations incorrectly implies that the bias directly changes the expert output scale.
@@ -125,11 +125,11 @@ Fine-grained scales reduce the range represented by one scale. The quantization 
 
 == FP8 in V3
 
-The V3 report [paper, #link("https://arxiv.org/abs/2412.19437")[2412.19437]] describes FP8 mixed precision with fine-grained quantization, online scaling, higher-precision accumulation, and low-precision states or communication where appropriate. The systems consequence is not simply half the bytes: scale metadata, reductions, overflow handling, and kernel support must fit the communication schedule. FP8 is reported as a training and communication design in V3; it should not be generalized to every DeepSeek checkpoint without a source.
+The V3 report @deepseek-v3 describes FP8 mixed precision with fine-grained quantization, online scaling, higher-precision accumulation, and low-precision states or communication where appropriate. The systems consequence is not simply half the bytes: scale metadata, reductions, overflow handling, and kernel support must fit the communication schedule. FP8 is reported as a training and communication design in V3; it should not be generalized to every DeepSeek checkpoint without a source.
 
 == FP4 in V4 and V4.1-Flash
 
-The V4 report [paper, #link("https://arxiv.org/abs/2606.19348")[2606.19348]] describes FP4 quantization-aware training for routed expert weights and the indexer query/key path. V4.1-Flash [paper, #link("https://arxiv.org/abs/2609.19969")[2609.19969]] additionally reports training with an FP4 main KV cache and marginal degradation in its experiments. Cache quantization trades memory bandwidth for quantization error and dequantization work; it does not alter the asymptotic attention expression by itself. The claims are report-specific and should be read with their calibration and hardware assumptions.
+The V4 report @deepseek-v4 describes FP4 quantization-aware training for routed expert weights and the indexer query/key path. The V4.1-Flash report @deepseek-v41-flash additionally reports training with an FP4 main KV cache and marginal degradation in its experiments. Cache quantization trades memory bandwidth for quantization error and dequantization work; it does not alter the asymptotic attention expression by itself. The claims are report-specific and should be read with their calibration and hardware assumptions.
 
 = Multi-Token Prediction and speculative verification
 
@@ -141,7 +141,7 @@ At inference, these predictions can propose a block. The target model verifies t
 
 $ C_"acc" approx (C_d + C_v) / (1 + a) $
 
-The estimate assumes the target can verify multiple positions efficiently and that rejected suffix work is bounded. V3 introduces MTP and states that it can support speculative decoding; the V3 report and the systems reflection #link("https://arxiv.org/abs/2505.09343")[2505.09343] report 80--90 percent acceptance for a second subsequent token and about 1.8 times generation throughput in one setting. DSpark replaces a fixed draft/verify policy with confidence scheduling; see #link("DeepSeek_Systems.pdf")[Systems].
+The estimate assumes the target can verify multiple positions efficiently and that rejected suffix work is bounded. V3 introduces MTP and states that it can support speculative decoding; the V3 report @deepseek-v3 and the systems reflection @v3-hardware report 80--90 percent acceptance for a second subsequent token and about 1.8 times generation throughput in one setting. DSpark replaces a fixed draft/verify policy with confidence scheduling; see #link("DeepSeek_Systems.pdf")[Systems].
 
 = Sparse attention: NSA, DSA, CSA, and HCA
 
@@ -149,7 +149,7 @@ Full causal attention computes scores for every query-key pair, with score and v
 
 == NSA: trainable hardware-aligned sparsity
 
-Native Sparse Attention (NSA) [paper, #link("https://arxiv.org/abs/2502.11089")[2502.11089]] combines three branches:
+The Native Sparse Attention (NSA) paper @nsa combines three branches:
 
 $ o_t = g_t^c op("Attn")(q_t, K_t^c, V_t^c) + g_t^s op("Attn")(q_t, K_t^s, V_t^s) + g_t^w op("Attn")(q_t, K_t^w, V_t^w) $
 
@@ -162,11 +162,11 @@ DeepSeek Sparse Attention (DSA) uses a lightweight lightning indexer to score qu
 $ I_t = op("TopK")_j(f_i(q_t, h_j)), quad |I_t| = k,
   quad o_t = op("Attn")(q_t, K_(I_t), V_(I_t)) $
 
-The attention part is $O(L k)$ rather than $O(L^2)$, while index construction and top-K selection add their own cost. The V3.2 report [paper, #link("https://arxiv.org/abs/2512.02556")[2512.02556]] uses $k = 2048$, a dense indexer warm-up, KL alignment to the dense attention distribution, and then sparse training. The model card for V3.2-Exp [model card, #link("https://api-docs.deepseek.com/news/news250929/")[official release note]] dates the model to 2025-09-29; the arXiv report arrived 2025-12-02. This is a model-before-paper case.
+The attention part is $O(L k)$ rather than $O(L^2)$, while index construction and top-K selection add their own cost. The V3.2 report @deepseek-v32 uses $k = 2048$, a dense indexer warm-up, KL alignment to the dense attention distribution, and then sparse training. The V3.2-Exp official release note @release-v32-exp dates the model to 2025-09-29; the arXiv report arrived 2025-12-02. This is a model-before-paper case.
 
 == CSA and HCA in V4
 
-V4 [paper, #link("https://arxiv.org/abs/2606.19348")[2606.19348]] combines two complementary approximations:
+The V4 report @deepseek-v4 combines two complementary approximations:
 
 - *Compressed Sparse Attention (CSA)* compresses sequence-wise KV information and then applies a DSA-style sparse lookup.
 - *Heavily Compressed Attention (HCA)* compresses more aggressively but retains dense attention over the compressed representation.
@@ -181,7 +181,7 @@ $ cal(B) = {H | H 1 = 1, quad 1^T H = 1^T, quad H >= 0} $
 
 A Sinkhorn-Knopp projection approximately normalizes rows and columns. Since a doubly stochastic matrix is a convex combination of permutation matrices, the residual operation is a structured feature mixing rather than arbitrary amplification. Under the ideal constraint, the spectral norm is at most one in the stated norm and products remain in the same family.
 
-The paper #link("https://arxiv.org/abs/2512.24880")[2512.24880] also constrains pre- and post-mixing maps to be nonnegative. Its systems argument matters as much as the geometry: ordinary Hyper-Connections add memory traffic approximately proportional to expansion rate $n$, with the paper's per-token read/write forms
+The mHC paper @mhc also constrains pre- and post-mixing maps to be nonnegative. Its systems argument matters as much as the geometry: ordinary Hyper-Connections add memory traffic approximately proportional to expansion rate $n$, with the paper's per-token read/write forms
 
 $ R_d = (5n + 1) C + n^2 + 2n, quad W_d = (3n + 1) C + n^2 + 2n $
 
@@ -199,7 +199,7 @@ $ z_t = h_t + alpha_t dot m_t $
 
 The exact implementation uses multiple N-gram orders, multi-head hashing, normalization, a depthwise causal convolution, and selected layers. Host-memory prefetch and sharding make the lookup a systems operation rather than a free table read.
 
-Engram [paper, #link("https://arxiv.org/abs/2601.07372")[2601.07372]] reports gains against an iso-parameter, iso-FLOPs MoE-27B baseline and a 100B table offloaded to host memory with less than 3 percent overhead in one experiment. The standalone repository #link("https://github.com/deepseek-ai/Engram")[Engram] is a demo that mocks standard components; it is an official repository, not a paper. V4.1-Flash's card and report name a 196B Engram component, which is separate model evidence.
+The Engram paper @engram reports gains against an iso-parameter, iso-FLOPs MoE-27B baseline and a 100B table offloaded to host memory with less than 3 percent overhead in one experiment. The standalone Engram repository @repo-engram is a demo that mocks standard components; it is an official repository, not a paper. V4.1-Flash's card and report name a 196B Engram component, which is separate model evidence.
 
 = CED and CSA2 in V4.1-Flash
 
@@ -211,7 +211,7 @@ $ O(N L) quad "versus" quad O(N L / 2 + n_w L / 2). $
 
 This is a source-oriented prefill accounting comparison, not an exact runtime theorem. Actual work also includes projecting encoder outputs into global KV, CSA2 index construction, cache writes and transfers, sparse-attention gathers, and bounded replay of local-window states. Those costs and their kernel implementations determine the realized latency and can dominate at smaller prompts.
 
-CED avoids recomputing full-prompt decoder state at every later layer by shifting work into encoder representations and projected cache state. The #link("https://arxiv.org/abs/2609.19969")[V4.1-Flash report] describes the architecture and its bounded-replay implementation; this note does not infer an unsupported exact speedup.
+CED avoids recomputing full-prompt decoder state at every later layer by shifting work into encoder representations and projected cache state. The V4.1-Flash report @deepseek-v41-flash describes the architecture and its bounded-replay implementation; this note does not infer an unsupported exact speedup.
 
 CSA2 reuses global KV and index information across layers with three modes:
 
@@ -238,4 +238,8 @@ V4.1-Flash reports pure CSA2 instead of V4's CSA+HCA hybrid, 890 bytes per token
 
 = Source trail
 
-The primary architecture trail is #link("https://arxiv.org/abs/2401.06066")[DeepSeekMoE], #link("https://arxiv.org/abs/2405.04434")[DeepSeek-V2], #link("https://arxiv.org/abs/2408.15664")[Auxiliary-Loss-Free Balancing], #link("https://arxiv.org/abs/2412.19437")[DeepSeek-V3], #link("https://arxiv.org/abs/2502.11089")[NSA], #link("https://arxiv.org/abs/2512.02556")[V3.2], #link("https://arxiv.org/abs/2512.24880")[mHC], #link("https://arxiv.org/abs/2601.07372")[Engram], #link("https://arxiv.org/abs/2606.19348")[V4], and #link("https://arxiv.org/abs/2609.19969")[V4.1-Flash]. Official repositories such as #link("https://github.com/deepseek-ai/DualPipe")[DualPipe] and #link("https://github.com/deepseek-ai/DeepEP")[DeepEP] are covered in #link("DeepSeek_Systems.pdf")[Systems] and are explicitly non-paper artifacts.
+The primary architecture trail is DeepSeekMoE @deepseek-moe, DeepSeek-V2 @deepseek-v2, Auxiliary-Loss-Free Balancing @loss-free-balancing, DeepSeek-V3 @deepseek-v3, NSA @nsa, V3.2 @deepseek-v32, mHC @mhc, Engram @engram, V4 @deepseek-v4, and V4.1-Flash @deepseek-v41-flash. Official repositories such as DualPipe @repo-dualpipe and DeepEP @repo-deepep are covered in #link("DeepSeek_Systems.pdf")[Systems] and are explicitly non-paper artifacts.
+
+= References
+
+#bibliography("references.bib", title: none)

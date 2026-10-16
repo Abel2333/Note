@@ -1,13 +1,14 @@
 # Makefile for Note project
 # Compiles Typst notes into PDFs
 
-.PHONY: all clean mathematics ml deep-learning deepseek guides watch help
+.PHONY: all clean mathematics optimization ml deep-learning deepseek guides watch help
 
 # Default target: build all notes
 all: mathematics ml deepseek guides
 
 # Build all Mathematics notes
-mathematics:
+# Optimization is strict so its failure propagates before legacy loops run.
+mathematics: optimization
 	@echo "Building Mathematics notes..."
 	@mkdir -p build/Mathematics/Statistics build/Mathematics/Analysis
 	@for file in notes/Mathematics/Statistics/*.typ; do \
@@ -17,6 +18,14 @@ mathematics:
 		[ -f "$$file" ] && typst compile --root . "$$file" "build/Mathematics/Analysis/$$(basename $$file .typ).pdf" || true; \
 	done
 	@echo "Mathematics notes built successfully!"
+
+# Build the Lagrangian-duality note.
+# This target is strict so a broken optimization foundation fails the build.
+optimization:
+	@set -e; \
+	mkdir -p build/Mathematics/Optimization; \
+	typst compile --root . notes/Mathematics/Optimization/Lagrangian_Duality.typ build/Mathematics/Optimization/Lagrangian_Duality.pdf
+	@echo "Optimization notes built successfully!"
 
 # Build all Machine Learning notes
 ml: deep-learning
@@ -77,6 +86,7 @@ help:
 	@echo "Available targets:"
 	@echo "  all         - Build all notes (default)"
 	@echo "  mathematics - Build only Mathematics notes"
+	@echo "  optimization - Build the Lagrangian-duality note"
 	@echo "  ml          - Build Machine Learning notes, including Deep Learning foundations"
 	@echo "  deep-learning - Build only general Deep Learning notes"
 	@echo "  deepseek    - Build the DeepSeek note collection"

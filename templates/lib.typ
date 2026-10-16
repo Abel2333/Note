@@ -82,8 +82,31 @@
   // --- Font and Paragraph ---
   show: body-fonts
   set text(size: 11pt)
-  set par(justify: true, leading: 0.8em)
+  // Keep block spacing stable while adjusting the separation of prose paragraphs.
+  set block(spacing: 1.2em)
+  set par(
+    justify: true,
+    leading: 0.8em,
+    spacing: 2.25em,
+    first-line-indent: 0pt,
+  )
+  set cite(style: "ieee")
+  set bibliography(style: "ieee")
+  let table-grid-stroke = 0.45pt + rgb("#CBD5DF")
+  let table-header-stroke = 0.85pt + rgb("#71869C")
+  set table(
+    fill: (_, y) => if y == 0 { rgb("#EAF1F7") } else { none },
+    // Match both sides so the body grid cannot override the header boundary.
+    stroke: (_, y) => if y == 0 {
+      (rest: table-grid-stroke, bottom: table-header-stroke)
+    } else if y == 1 {
+      (rest: table-grid-stroke, top: table-header-stroke)
+    } else {
+      table-grid-stroke
+    },
+  )
   set table.cell(breakable: false)
+  show table.cell.where(y: 0): set text(weight: "bold")
   show figure.caption: set text(size: 9pt, fill: rgb("#5A5A5A"))
   show figure.caption: set par(justify: false, leading: 0.55em)
   set figure(gap: 0.6em)

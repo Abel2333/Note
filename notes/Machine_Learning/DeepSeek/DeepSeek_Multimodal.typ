@@ -19,7 +19,7 @@ Compression is useful only if the retained tokens preserve the task-relevant inf
 
 = DeepSeek-VL: high resolution without abandoning language
 
-DeepSeek-VL [paper, #link("https://arxiv.org/abs/2403.05525")[2403.05525]] uses a hybrid vision encoder: a text-aligned semantic path and a high-resolution path. A 1024 by 1024 image is condensed to 576 visual tokens in the reported configuration. The training recipe has three broad stages:
+The DeepSeek-VL paper @deepseek-vl uses a hybrid vision encoder: a text-aligned semantic path and a high-resolution path. A 1024 by 1024 image is condensed to 576 visual tokens in the reported configuration. The training recipe has three broad stages:
 
 1. train an adaptor while the language model is mostly frozen;
 2. jointly pre-train vision and language data;
@@ -31,7 +31,7 @@ The important design constraint is a fixed visual-token budget. If an image prod
 
 = DeepSeek-VL2: dynamic tiling and sparse language modeling
 
-DeepSeek-VL2 [paper, #link("https://arxiv.org/abs/2412.10302")[2412.10302]] replaces fixed image sizes with dynamic tiling. Candidate layouts of $m times n$ tiles are considered subject to a bounded tile count. One global thumbnail preserves context while local tiles preserve detail. A 2 by 2 pixel shuffle changes a 27 by 27 feature grid into roughly 14 by 14 visual tokens per tile:
+The DeepSeek-VL2 paper @deepseek-vl2 replaces fixed image sizes with dynamic tiling. Candidate layouts of $m times n$ tiles are considered subject to a bounded tile count. One global thumbnail preserves context while local tiles preserve detail. A 2 by 2 pixel shuffle changes a 27 by 27 feature grid into roughly 14 by 14 visual tokens per tile:
 
 $ 27 times 27 = 729 quad -> quad 14 times 14 = 196. $
 
@@ -47,7 +47,7 @@ VL2 also uses DeepSeekMoE and MLA in its language backbone, with routed and shar
 
 == Janus and Janus-Pro
 
-Janus [paper, #link("https://arxiv.org/abs/2410.13848")[2410.13848]] uses one autoregressive transformer with two visual paths:
+The Janus paper @janus uses one autoregressive transformer with two visual paths:
 
 - an understanding encoder such as SigLIP, flattened and mapped by an adaptor;
 - a generation tokenizer, mapped through a separate adaptor and image prediction head.
@@ -58,11 +58,11 @@ $ z = [z_t; z_u; z_g] $
 
 The paths are decoupled because understanding benefits from semantic, often high-resolution features, while generation benefits from discrete or spatially regular image tokens. A single transformer can share language reasoning while avoiding the demand that one visual representation serve incompatible objectives.
 
-Janus-Pro [paper, #link("https://arxiv.org/abs/2501.17811")[2501.17811]] scales the model and data recipe to 1B and 7B variants. It reports improved MMBench and GenEval values, but those are paper-reported evaluations. The arXiv metadata notes overlap with Janus; that establishes a paper lineage, not a claim that every later product uses the same generation head.
+The Janus-Pro paper @janus-pro scales the model and data recipe to 1B and 7B variants. It reports improved MMBench and GenEval values, but those are paper-reported evaluations. The arXiv metadata notes overlap with Janus; that establishes a paper lineage, not a claim that every later product uses the same generation head.
 
 == JanusFlow
 
-JanusFlow [paper, #link("https://arxiv.org/abs/2411.07975")[2411.07975]] explores a rectified-flow generation head inside the language-model framework. The image path evolves a latent state by an ODE-like update:
+The JanusFlow paper @janusflow explores a rectified-flow generation head inside the language-model framework. The image path evolves a latent state by an ODE-like update:
 
 $ z_(t + Delta t) = z_t + v_theta(z_t, t, c) Delta t, $
 
@@ -72,7 +72,7 @@ then decodes the final latent with a VAE. The paper presents this as a way to av
 
 == DeepSeek-OCR
 
-DeepSeek-OCR [paper, #link("https://arxiv.org/abs/2510.18234")[2510.18234]] asks whether a page can be represented as an image whose visual tokens are decoded into text. Its DeepEncoder combines perception, convolutional token compression, and a semantic vision stage; the decoder is a sparse DeepSeek language model.
+The DeepSeek-OCR paper @deepseek-ocr asks whether a page can be represented as an image whose visual tokens are decoded into text. Its DeepEncoder combines perception, convolutional token compression, and a semantic vision stage; the decoder is a sparse DeepSeek language model.
 
 If a page has $N_t$ text tokens and $N_v$ visual tokens, define a compression ratio
 
@@ -84,17 +84,17 @@ The model uses a mixture of OCR, general vision, and text-only data. The systems
 
 == DeepSeek-OCR 2: visual causal flow
 
-DeepSeek-OCR 2 [paper, #link("https://arxiv.org/abs/2601.20552")[2601.20552]] keeps the OCR decoder largely unchanged and changes the visual tokenizer. Its DeepEncoder V2 adds causal-flow queries after bidirectionally attended visual tokens. A simplified mask has four regions:
+The DeepSeek-OCR 2 paper @deepseek-ocr2 keeps the OCR decoder largely unchanged and changes the visual tokenizer. Its DeepEncoder V2 adds causal-flow queries after bidirectionally attended visual tokens. A simplified mask has four regions:
 
 $ M = [[1_(m times m), 0_(m times n)], [1_(n times m), op("LowerTri")(n) ]] $
 
 The first block lets visual tokens interact bidirectionally; the second lets flow queries attend to visual tokens and to earlier flow queries. Only the flow-query outputs are passed to the decoder. With a global 1024 by 1024 crop and local 768 by 768 crops, the reported visual-token budget is between 256 and 1120.
 
-The paper reports a 3.73 percent gain on OmniDocBench v1.5 relative to its OCR baseline. The model's own overall table value was not available in the checked extraction, so the collection does not invent one from competitor rows. The official #link("https://github.com/deepseek-ai/DeepSeek-OCR-2")[DeepSeek-OCR-2 repository] is a non-paper artifact that can document code and weights but cannot replace the paper for the number.
+The paper reports a 3.73 percent gain on OmniDocBench v1.5 relative to its OCR baseline. The model's own overall table value was not available in the checked extraction, so the collection does not invent one from competitor rows. The official DeepSeek-OCR-2 repository @repo-ocr2 is a non-paper artifact that can document code and weights but cannot replace the paper for the number.
 
 = V4 and V4.1-Flash multimodality
 
-V4's main report [paper, #link("https://arxiv.org/abs/2606.19348")[2606.19348]] is primarily a long-context foundation-model report. The multimodal evolution is more explicit in the V4.1-Flash report [paper, #link("https://arxiv.org/abs/2609.19969")[2609.19969]] and card.
+The V4 main report @deepseek-v4 is primarily a long-context foundation-model report. The multimodal evolution is more explicit in the V4.1-Flash report @deepseek-v41-flash and card.
 
 == From-scratch visual path
 
@@ -112,7 +112,7 @@ The report claims 45T multimodal pre-training tokens, 40 layers split into 20 en
 
 == Product versus paper
 
-The V4-Flash-Vision-Exp API release #link("https://api-docs.deepseek.com/news/news260821/")[official release note] is a product event. Its later card is model-card evidence. Neither should be cited as if it were the V4.1-Flash paper. "Thinking with Visual Primitives" is represented in the checked sources by a #link("https://zenodo.org/records/20125351")[Zenodo technical-report record] and a #link("https://huggingface.co/datasets/NodeLinker/deepseek-ai-Thinking-with-Visual-Primitives-deleted-repo")[third-party mirror of its deleted repository], not by an arXiv paper. Those artifacts do not establish that the technique shipped in a production visual model.
+The V4-Flash-Vision-Exp API official release note @release-v4-vision is a product event. Its later model card @card-v4-vision-exp is model-card evidence. Neither should be cited as if it were the V4.1-Flash paper. "Thinking with Visual Primitives" is represented in the checked sources by a Zenodo technical-report record @visual-primitives-zenodo and a third-party mirror of its deleted repository @visual-primitives-mirror, not by an arXiv paper. Those artifacts do not establish that the technique shipped in a production visual model.
 
 = Multimodal comparison
 
@@ -136,4 +136,8 @@ No checked source establishes a DeepSeek-VL3 release, a later production landing
 
 = Source trail
 
-Papers: #link("https://arxiv.org/abs/2403.05525")[DeepSeek-VL], #link("https://arxiv.org/abs/2412.10302")[DeepSeek-VL2], #link("https://arxiv.org/abs/2410.13848")[Janus], #link("https://arxiv.org/abs/2411.07975")[JanusFlow], #link("https://arxiv.org/abs/2501.17811")[Janus-Pro], #link("https://arxiv.org/abs/2510.18234")[DeepSeek-OCR], #link("https://arxiv.org/abs/2601.20552")[DeepSeek-OCR 2], and #link("https://arxiv.org/abs/2609.19969")[V4.1-Flash]. Product and artifact links are the #link("https://api-docs.deepseek.com/news/news260821/")[Vision release note], #link("https://github.com/deepseek-ai/DeepSeek-OCR-2")[DeepSeek-OCR-2 repository], and #link("https://github.com/deepseek-ai/Janus")[Janus repository]; each is marked as non-paper evidence where used.
+Papers: DeepSeek-VL @deepseek-vl, DeepSeek-VL2 @deepseek-vl2, Janus @janus, JanusFlow @janusflow, Janus-Pro @janus-pro, DeepSeek-OCR @deepseek-ocr, DeepSeek-OCR 2 @deepseek-ocr2, and V4.1-Flash @deepseek-v41-flash. Product and artifact sources are the Vision release note @release-v4-vision, DeepSeek-OCR-2 repository @repo-ocr2, and Janus repository @repo-janus; each is marked as non-paper evidence where used.
+
+= References
+
+#bibliography("references.bib", title: none)
